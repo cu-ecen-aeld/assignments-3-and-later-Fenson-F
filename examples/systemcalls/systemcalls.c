@@ -16,7 +16,11 @@ bool do_system(const char *cmd)
  *   and return a boolean true if the system() call completed with success
  *   or false() if it returned a failure
 */
-
+int check = -1;
+check = system(cmd);
+if (check == -1){
+    return false;
+}
     return true;
 }
 
@@ -38,7 +42,7 @@ bool do_exec(int count, ...)
 {
     va_list args;
     va_start(args, count);
-    char * command[count+1];
+    char *command[count + 1];
     int i;
     for(i=0; i<count; i++)
     {
@@ -58,10 +62,39 @@ bool do_exec(int count, ...)
  *   as second argument to the execv() command.
  *
 */
-
     va_end(args);
 
-    return true;
+    int status;
+    __pid_t pid;
+
+    pid = fork();
+    if (pid == -1)
+        return false;
+    else if (pid == 0) 
+    {
+        int check;
+        int j;
+        char *end_command[count];
+
+        for(j=1; j<count; j++)
+        {
+            end_command[j-1] = command[j];
+        }
+
+        check = execv (command[0], end_command);
+        
+        if (check == -1)
+        {
+            return false;
+        }
+        return false;
+    }
+    if (waitpid (pid, &status, 0) == -1)
+        return false;
+    else if (WIFEXITED (status))
+        return WEXITSTATUS (status);
+    
+    return false;
 }
 
 /**
@@ -94,6 +127,55 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
 */
 
     va_end(args);
+    
+    int status;
+    __pid_t pidr;
+    
+    int fd = open(outputfile,0644);
 
+    if(fd== -1)
+    {
+        /*perror("open");*/
+        return false;
+    }
+
+    switch (pidr = fork()) 
+    {
+        case -1:
+        { 
+            return false;
+        }
+        case 0:
+        {
+            if(dup2(fd,1) <0 )
+            {
+                close(fd);
+            }
+            close(fd);
+            
+            int check;
+            int j;
+            char *end_command[count];
+
+            for(j=1; j<count; j++)
+            {
+                end_command[j-1] = command[j];
+            }
+
+            execvp(command[0],end_command);
+
+            if (waitpid (pidr, &status, 0) == -1)
+                return false;
+            else if (WIFEXITED (status))
+                return WEXITSTATUS (status);
+
+            return false;
+        }
+        default:
+        {
+            close(fd);
+        }
+    }
+    
     return true;
 }
