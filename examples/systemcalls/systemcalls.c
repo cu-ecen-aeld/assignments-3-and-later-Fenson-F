@@ -53,14 +53,20 @@ bool do_exec(int count, ...)
     va_start(args, count);
     char *command[count + 1];
     int i=0;
+
     for (i = 0; i < count; i++)
     {
         command[i] = va_arg(args, char *);
     }
     command[count] = NULL;
-    // this line is to avoid a compile warning before your implementation is complete
-    // and may be removed
-    // command[count] = command[count];
+
+    //checks that there are 2 or more commands
+    if (count < 2)
+        return false;
+
+    //checks if an executable file or command
+    if (access(command[count - 1], X_OK) == -1)
+        return false;
 
     /*
      * TODO:
@@ -72,16 +78,6 @@ bool do_exec(int count, ...)
      *
      */
 
-    /*if (command[count]!="/bin/echo")
-    {
-        return false;
-    }*/
-
-    if (count < 2)
-    {
-        return false;
-    }
-
     int status;
     pid_t pid;
     pid = fork();
@@ -89,19 +85,12 @@ bool do_exec(int count, ...)
         return false;
     else if(pid == 0)
     {
-        int fd;
         int ret;
-
-        fd = access(command[count - 1], F_OK);
-        if (fd == -1)
-        {
-            return false;
-        }
 
         ret = execv(command[0], command);
         if (ret != 0)
         {
-            return false;
+            exit(1);
         }
         return false;
     }
@@ -111,8 +100,9 @@ bool do_exec(int count, ...)
         return false;
     }
     else if (WIFEXITED(status)==true)
+    {
         return true;
-
+    }
     va_end(args);
     return false;
 }
@@ -128,14 +118,16 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
     va_start(args, count);
     char *command[count + 1];
     int i;
+    
     for (i = 0; i < count; i++)
     {
         command[i] = va_arg(args, char *);
     }
     command[count] = NULL;
-    // this line is to avoid a compile warning before your implementation is complete
-    // and may be removed
-    //command[count] = command[count];
+    
+    //checks if there are 2 or more commands
+    if (count < 2)
+        return false;
 
     /*
      * TODO
@@ -145,17 +137,10 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
      *
      */
 
-   
-
-    if (count < 2)
-    {
-        return false;
-    }
-
     int status2;
     pid_t pidr;
 
-    int fd = open(outputfile, O_WRONLY | O_APPEND | O_CREAT, 0644);
+    int fd = open(outputfile, O_WRONLY | O_CREAT, 0644);
 
     if (fd == -1)
     {
@@ -173,11 +158,6 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
     {
         close(fd);
     }
-    else if ((access(command[count - 1], F_OK))==-1)
-    {
-        close(fd);
-        return false;
-    }
     else
     {
         if (dup2(fd, 1) < 0)
@@ -191,7 +171,7 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
         
         if (ret2 != 0)
         {
-            return false;
+            exit(1);
         }
     }
 
