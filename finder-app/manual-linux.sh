@@ -9,9 +9,10 @@ set -u
 OUTDIR=/tmp/aeld
 KERNEL_REPO=git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git
 KERNEL_VERSION=v5.1.10
-KERNEL_PATCH=/home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/finder-app/kernel-patch/
+
 BUSYBOX_VERSION=1_33_1
 FINDER_APP_DIR=$(realpath $(dirname $0))
+KERNEL_PATCH=${FINDER_APP_DIR}/kernel-patch/
 ARCH=arm64
 CROSS_COMPILE=aarch64-none-linux-gnu-
 CROSS_COMPILE_LIB=/home/fenson/arm-cross-compiler/install/gcc-arm-10.2-2020.11-x86_64-aarch64-none-linux-gnu/aarch64-none-linux-gnu/libc/
