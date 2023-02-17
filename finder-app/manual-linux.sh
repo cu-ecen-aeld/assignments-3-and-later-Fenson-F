@@ -15,7 +15,7 @@ FINDER_APP_DIR=$(realpath $(dirname $0))
 KERNEL_PATCH=${FINDER_APP_DIR}/kernel-patch/
 ARCH=arm64
 CROSS_COMPILE=aarch64-none-linux-gnu-
-CROSS_COMPILE_LIB=/home/fenson/arm-cross-compiler/install/gcc-arm-10.2-2020.11-x86_64-aarch64-none-linux-gnu/aarch64-none-linux-gnu/libc/
+CROSS_COMPILE_LIB=${FINDER_APP_DIR}/GNU-Libs/
 
 if [ $# -lt 1 ]
 then
