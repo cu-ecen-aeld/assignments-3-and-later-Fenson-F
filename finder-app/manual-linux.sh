@@ -110,9 +110,9 @@ ${CROSS_COMPILE}readelf -a bin/busybox | grep "Shared library"
 cp -f ${CROSS_COMPILE_LIB}/lib/ld-linux-aarch64.so.1 ${OUTDIR}/rootfs/lib
 #cp -f ${CROSS_COMPILE_LIB}/lib64/* ${OUTDIR}/rootfs/lib64
 
-cp -f ${CROSS_COMPILE_LIB}/lib64/libm.so.6 ${OUTDIR}/rootfs/lib64
-cp -f ${CROSS_COMPILE_LIB}/lib64/libresolv.so.2 ${OUTDIR}/rootfs/lib64
-cp -f ${CROSS_COMPILE_LIB}/lib64/libc.so.6 ${OUTDIR}/rootfs/lib64
+cp -f -L ${CROSS_COMPILE_LIB}/lib64/libm.so.6 ${OUTDIR}/rootfs/lib64
+cp -f -L ${CROSS_COMPILE_LIB}/lib64/libresolv.so.2 ${OUTDIR}/rootfs/lib64
+cp -f -L ${CROSS_COMPILE_LIB}/lib64/libc.so.6 ${OUTDIR}/rootfs/lib64
 
 # TODO: Make device nodes
 cd "$OUTDIR/rootfs"
