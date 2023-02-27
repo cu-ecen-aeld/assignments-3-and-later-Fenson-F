@@ -2,15 +2,16 @@
 # Tester script for assignment 1 and assignment 2
 # Author: Siddhant Jajoo
 # Edited for A2 by F Fenlon
-#Edited for A3.1 by F Fenlon
+# Edited for A3.1 by F Fenlon
+# Edited for 4.2 by F Fenlon
 
 set -e
 set -u
 
 NUMFILES=10
 WRITESTR=AELD_IS_FUN
-WRITEDIR=/tmp/aeld-data
-username=$(cat conf/username.txt)
+WRITEDIR=/tmp
+username=$(cat /etc/finder-app/conf/username.txt)
 
 if [ $# -lt 3 ]
 then
@@ -24,7 +25,7 @@ then
 else
 	NUMFILES=$1
 	WRITESTR=$2
-	WRITEDIR=/tmp/aeld-data/$3
+	WRITEDIR=/tmp/$3
 fi
 
 MATCHSTR="The number of files are ${NUMFILES} and the number of matching lines are ${NUMFILES}"
@@ -35,7 +36,7 @@ rm -rf "${WRITEDIR}"
 
 # create $WRITEDIR if not assignment1
 #assignment=`cat ../conf/assignment.txt`
-assignment=`cat conf/assignment.txt`
+assignment=`cat /etc/finder-app/conf/assignment.txt`
 
 if [ $assignment != 'assignment1' ]
 then
@@ -57,13 +58,13 @@ fi
 
 for i in $( seq 1 $NUMFILES)
 do
-	./writer "$WRITEDIR/${username}$i.txt" "$WRITESTR"
+	writer "$WRITEDIR/assignment4-result.txt" "$WRITESTR"
 done
 
-OUTPUTSTRING=$(./finder.sh "$WRITEDIR" "$WRITESTR")
+OUTPUTSTRING=$(finder "$WRITEDIR" "$WRITESTR")
 
 # remove temporary directories
-rm -rf /tmp/aeld-data
+rm -rf $WRITEDIR
 
 set +e
 echo ${OUTPUTSTRING} | grep "${MATCHSTR}"
