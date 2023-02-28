@@ -11,7 +11,7 @@ all: $(TARGET)
 
 #$(TARGET) : $(OBJS)
 $(TARGET) :
-	$(CC) $(CFLAGS) $(INCLUDES) $(OBJS) -c $(TARGET).c -o $(TARGET)
+	$(CC) $(CFLAGS) $(INCLUDES) $(OBJS) -c $(TARGET).c -o $(TARGET).o
 	$(CC) $(CFLAGS) $(INCLUDES) $(OBJS) -o $(TARGET) $(TARGET).o
 	
 #CROSS_COMPILE aarch64-none-linux-gnu- : $(OBJS)
