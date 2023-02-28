@@ -128,6 +128,7 @@ if [ -f "writer" ]
    echo "Previous writer executable deleted"
  fi
 ${CROSS_COMPILE}gcc writer.c -o writer
+${CROSS_COMPILE}gcc writer.o -o writer 
 echo "Writer executable created. File Details:"
 file writer
 
