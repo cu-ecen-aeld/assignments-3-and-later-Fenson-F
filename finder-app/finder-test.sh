@@ -70,7 +70,7 @@ echo ${OUTPUTSTRING} > ${PATH}
 
 # remove temporary directories
 
-rm -rf /tmp/aeld-data
+rm -rf $WRITEDIR
 
 set +e
 echo ${OUTPUTSTRING} | grep "${MATCHSTR}"
