@@ -11,6 +11,7 @@ set -u
 NUMFILES=10
 WRITESTR=AELD_IS_FUN
 WRITEDIR=/tmp/aeld-tmp
+LIB_DIR=/usr/bin
 username=$(cat /etc/finder-app/conf/username.txt)
 
 if [ $# -lt 3 ]
@@ -70,10 +71,10 @@ echo ${OUTPUTSTRING} > ${PATH}
 
 # remove temporary directories
 
-#rm -rf $WRITEDIR
+$LIB_DIR/rm -rf $WRITEDIR
 
 set +e
-echo ${OUTPUTSTRING} | grep "${MATCHSTR}"
+echo ${OUTPUTSTRING} | $LIB_DIR/grep "${MATCHSTR}"
 if [ $? -eq 0 ]; then
 	echo "success"
 	exit 0
