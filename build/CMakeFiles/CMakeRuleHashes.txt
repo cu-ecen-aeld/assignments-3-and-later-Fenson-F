@@ -1,0 +1,2 @@
+# Hashes of file build rules.
+90dfec7eecee0c46ea210b09cc1114fe /home/fenson/aesd-assignments/assignment-4-Fenson-F/assignments-3-and-later-Fenson-F/assignment-autotest/test/assignment1/Test_hello_Runner.c
