@@ -70,7 +70,7 @@ echo ${OUTPUTSTRING} > ${PATH}
 
 # remove temporary directories
 
-rm -rf $WRITEDIR
+#rm -rf $WRITEDIR
 
 set +e
 echo ${OUTPUTSTRING} | grep "${MATCHSTR}"
