@@ -106,9 +106,12 @@ ${CROSS_COMPILE}readelf -a bin/busybox | grep "Shared library"
 
 # TODO: Add library dependencies to rootfs
 # Add program interpreter to lib and add libraries to lib64
-#cp -f ${CROSS_COMPILE_LIB}/ld-linux-aarch64.so.1 ${OUTDIR}/rootfs/lib
-cp -f ${CROSS_COMPILE_LIB}/lib/ld-linux-aarch64.so.1 ${OUTDIR}/rootfs/lib
-cp -f ${CROSS_COMPILE_LIB}/lib64/* ${OUTDIR}/rootfs/lib64
+export SYSROOT=$(${CROSS_COMPILE}gcc -print-sysroot)
+
+sudo	cp -aL "${SYSROOT}/lib/ld-linux-aarch64.so.1" "${OUTDIR}/rootfs/lib"
+sudo	cp -aL "${SYSROOT}/lib64/libm.so.6" "${OUTDIR}/rootfs/lib64"
+sudo	cp -aL "${SYSROOT}/lib64/libresolv.so.2" "${OUTDIR}/rootfs/lib64"
+sudo	cp -aL "${SYSROOT}/lib64/libc.so.6" "${OUTDIR}/rootfs/lib64"
 
 #cp -f -L ${CROSS_COMPILE_LIB}/libm.so.6 ${OUTDIR}/rootfs/lib64
 #cp -f -L ${CROSS_COMPILE_LIB}/libresolv.so.2 ${OUTDIR}/rootfs/lib64
