@@ -11,7 +11,7 @@ set -u
 NUMFILES=10
 WRITESTR=AELD_IS_FUN
 WRITEDIR=/tmp/aeld-tmp
-LIB_DIR=/usr/bin
+LIB_DIR=/bin
 username=$(cat /etc/finder-app/conf/username.txt)
 
 if [ $# -lt 3 ]
