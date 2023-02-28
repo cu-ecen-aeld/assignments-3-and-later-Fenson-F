@@ -122,15 +122,9 @@ sudo mknod -m 600 dev/console c 5 1
 
 # TODO: Clean and build the writer utility
 cd "$FINDER_APP_DIR"
-if [ -f "writer" ]
- then
-   rm writer
-   echo "Previous writer executable deleted"
- fi
-${CROSS_COMPILE}gcc writer.c -o writer
-${CROSS_COMPILE}gcc writer.o -o writer 
-echo "Writer executable created. File Details:"
-file writer
+make ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} clean
+make ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} 
+
 
 # TODO: Copy the finder related scripts and executables to the /home directory
 # on the target rootfs
