@@ -150,7 +150,7 @@ int main(int argc, char **argv){
     }
     
     //checking if file already exists. If it does, delete before starting loop (assignment specific, may delete in future)
-    if(access(serverfile_loc, F_OK) == 0)
+    /*if(access(serverfile_loc, F_OK) == 0)
     {
         printf("File already exists. Deleting before proceeding.");
         if(remove(serverfile_loc)!=0)
@@ -162,7 +162,7 @@ int main(int argc, char **argv){
         {
             printf("File deleted succesfully. \n");
         }
-    }
+    }*/
 
 
     // While loop that listens for new sockets before entering inner loop to receive data
