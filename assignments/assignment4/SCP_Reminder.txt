@@ -1,0 +1,3 @@
+To get scp to work post OpenSSH, add -O flag BEFORE -P flag
+
+scp -O -P 10022 root@localhost:/tmp/assignment4-result.txt .

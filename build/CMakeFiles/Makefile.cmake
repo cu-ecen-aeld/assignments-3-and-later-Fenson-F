@@ -7,10 +7,17 @@ set(CMAKE_DEPENDS_GENERATOR "Unix Makefiles")
 # The top level Makefile was generated from the following files:
 set(CMAKE_MAKEFILE_DEPENDS
   "CMakeCache.txt"
+<<<<<<< HEAD
   "/home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/CMakeLists.txt"
   "/home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/assignment-autotest/CMakeLists.txt"
   "/home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/assignment-autotest/Unity/CMakeLists.txt"
   "/home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/assignment-autotest/Unity/src/CMakeLists.txt"
+=======
+  "/home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/CMakeLists.txt"
+  "/home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/assignment-autotest/CMakeLists.txt"
+  "/home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/assignment-autotest/Unity/CMakeLists.txt"
+  "/home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/assignment-autotest/Unity/src/CMakeLists.txt"
+>>>>>>> 4d3cdb69f08954fbce6baee3e44b80a5395ce581
   "CMakeFiles/3.25.1/CMakeCCompiler.cmake"
   "CMakeFiles/3.25.1/CMakeCXXCompiler.cmake"
   "CMakeFiles/3.25.1/CMakeSystem.cmake"

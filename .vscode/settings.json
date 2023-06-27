@@ -1,3 +1,8 @@
 {
+<<<<<<< HEAD
     "cmake.configureOnOpen": false
+=======
+    "cmake.configureOnOpen": true,
+    "C_Cpp.errorSquiggles": "disabled"
+>>>>>>> 4d3cdb69f08954fbce6baee3e44b80a5395ce581
 }

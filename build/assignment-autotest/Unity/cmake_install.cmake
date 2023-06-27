@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 # Install script for directory: /home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/assignment-autotest/Unity
+=======
+# Install script for directory: /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/assignment-autotest/Unity
+>>>>>>> 4d3cdb69f08954fbce6baee3e44b80a5395ce581
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -43,14 +47,22 @@ if(NOT DEFINED CMAKE_OBJDUMP)
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
+<<<<<<< HEAD
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/src" TYPE DIRECTORY FILES "/home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/assignment-autotest/Unity/src/")
+=======
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/src" TYPE DIRECTORY FILES "/home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/assignment-autotest/Unity/src/")
+>>>>>>> 4d3cdb69f08954fbce6baee3e44b80a5395ce581
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
   if(EXISTS "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/share/unityConfig/cmake/unityConfig.cmake")
     file(DIFFERENT _cmake_export_file_changed FILES
          "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/share/unityConfig/cmake/unityConfig.cmake"
+<<<<<<< HEAD
          "/home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/build/assignment-autotest/Unity/CMakeFiles/Export/48c7e70bc4cd97bc87a4e6ab65f93d66/unityConfig.cmake")
+=======
+         "/home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/build/assignment-autotest/Unity/CMakeFiles/Export/48c7e70bc4cd97bc87a4e6ab65f93d66/unityConfig.cmake")
+>>>>>>> 4d3cdb69f08954fbce6baee3e44b80a5395ce581
     if(_cmake_export_file_changed)
       file(GLOB _cmake_old_config_files "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/share/unityConfig/cmake/unityConfig-*.cmake")
       if(_cmake_old_config_files)
@@ -63,15 +75,25 @@ if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT
     endif()
     unset(_cmake_export_file_changed)
   endif()
+<<<<<<< HEAD
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/unityConfig/cmake" TYPE FILE FILES "/home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/build/assignment-autotest/Unity/CMakeFiles/Export/48c7e70bc4cd97bc87a4e6ab65f93d66/unityConfig.cmake")
   if(CMAKE_INSTALL_CONFIG_NAME MATCHES "^()$")
     file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/unityConfig/cmake" TYPE FILE FILES "/home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/build/assignment-autotest/Unity/CMakeFiles/Export/48c7e70bc4cd97bc87a4e6ab65f93d66/unityConfig-noconfig.cmake")
+=======
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/unityConfig/cmake" TYPE FILE FILES "/home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/build/assignment-autotest/Unity/CMakeFiles/Export/48c7e70bc4cd97bc87a4e6ab65f93d66/unityConfig.cmake")
+  if(CMAKE_INSTALL_CONFIG_NAME MATCHES "^()$")
+    file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/unityConfig/cmake" TYPE FILE FILES "/home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/build/assignment-autotest/Unity/CMakeFiles/Export/48c7e70bc4cd97bc87a4e6ab65f93d66/unityConfig-noconfig.cmake")
+>>>>>>> 4d3cdb69f08954fbce6baee3e44b80a5395ce581
   endif()
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
+<<<<<<< HEAD
   include("/home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/build/assignment-autotest/Unity/src/cmake_install.cmake")
+=======
+  include("/home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/build/assignment-autotest/Unity/src/cmake_install.cmake")
+>>>>>>> 4d3cdb69f08954fbce6baee3e44b80a5395ce581
 
 endif()
 

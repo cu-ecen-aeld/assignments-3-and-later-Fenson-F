@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <pthread.h>
+#include <time.h>
 
 /**
  * This structure should be dynamically allocated and passed as
@@ -14,7 +15,11 @@ struct thread_data{
      * between the start_thread_obtaining_mutex function and
      * your thread implementation.
      */
-
+    //pthread_t *thread_id;
+    pthread_mutex_t *mutex;
+    int wait_to_obtain;
+    int wait_to_release;
+    
     /**
      * Set to true if the thread completed with success, false
      * if an error occurred.

@@ -50,14 +50,22 @@ unset(_cmake_expected_targets)
 add_library(unity STATIC IMPORTED)
 
 set_target_properties(unity PROPERTIES
+<<<<<<< HEAD
   INTERFACE_INCLUDE_DIRECTORIES "/home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/assignment-autotest/Unity/src"
+=======
+  INTERFACE_INCLUDE_DIRECTORIES "/home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/assignment-autotest/Unity/src"
+>>>>>>> 4d3cdb69f08954fbce6baee3e44b80a5395ce581
 )
 
 # Import target "unity" for configuration ""
 set_property(TARGET unity APPEND PROPERTY IMPORTED_CONFIGURATIONS NOCONFIG)
 set_target_properties(unity PROPERTIES
   IMPORTED_LINK_INTERFACE_LANGUAGES_NOCONFIG "C"
+<<<<<<< HEAD
   IMPORTED_LOCATION_NOCONFIG "/home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/build/assignment-autotest/Unity/src/libunity.a"
+=======
+  IMPORTED_LOCATION_NOCONFIG "/home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/build/assignment-autotest/Unity/src/libunity.a"
+>>>>>>> 4d3cdb69f08954fbce6baee3e44b80a5395ce581
   )
 
 # This file does not depend on other imported targets which have

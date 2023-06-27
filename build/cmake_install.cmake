@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 # Install script for directory: /home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F
+=======
+# Install script for directory: /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F
+>>>>>>> 4d3cdb69f08954fbce6baee3e44b80a5395ce581
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -44,7 +48,11 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
+<<<<<<< HEAD
   include("/home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/build/assignment-autotest/cmake_install.cmake")
+=======
+  include("/home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/build/assignment-autotest/cmake_install.cmake")
+>>>>>>> 4d3cdb69f08954fbce6baee3e44b80a5395ce581
 
 endif()
 
@@ -56,5 +64,9 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
+<<<<<<< HEAD
 file(WRITE "/home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/build/${CMAKE_INSTALL_MANIFEST}"
+=======
+file(WRITE "/home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/build/${CMAKE_INSTALL_MANIFEST}"
+>>>>>>> 4d3cdb69f08954fbce6baee3e44b80a5395ce581
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
