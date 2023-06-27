@@ -1,4 +1,4 @@
-# Install script for directory: /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignments-3-and-later-Fenson-F/assignments-3-and-later-Fenson-F/assignment-autotest
+# Install script for directory: /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/assignment-autotest
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -44,7 +44,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/home/fenson/aesd-assignments/assignment-5-Fenson-F/assignments-3-and-later-Fenson-F/assignments-3-and-later-Fenson-F/build/assignment-autotest/Unity/cmake_install.cmake")
+  include("/home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/build/assignment-autotest/Unity/cmake_install.cmake")
 
 endif()
 

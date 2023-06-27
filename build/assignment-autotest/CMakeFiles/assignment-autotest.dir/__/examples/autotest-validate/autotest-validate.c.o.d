@@ -1,7 +1,7 @@
 assignment-autotest/CMakeFiles/assignment-autotest.dir/__/examples/autotest-validate/autotest-validate.c.o: \
- /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignments-3-and-later-Fenson-F/assignments-3-and-later-Fenson-F/examples/autotest-validate/autotest-validate.c \
+ /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/examples/autotest-validate/autotest-validate.c \
  /usr/include/stdc-predef.h \
- /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignments-3-and-later-Fenson-F/assignments-3-and-later-Fenson-F/examples/autotest-validate/autotest-validate.h \
+ /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/examples/autotest-validate/autotest-validate.h \
  /usr/lib/gcc/x86_64-linux-gnu/12/include/stdbool.h /usr/include/stdio.h \
  /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
  /usr/include/features.h /usr/include/features-time64.h \

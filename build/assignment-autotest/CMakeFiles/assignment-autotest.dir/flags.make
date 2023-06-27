@@ -4,7 +4,7 @@
 # compile C with /usr/bin/cc
 C_DEFINES = 
 
-C_INCLUDES = -I/home/fenson/aesd-assignments/assignment-5-Fenson-F/assignments-3-and-later-Fenson-F/assignments-3-and-later-Fenson-F/assignment-autotest/Unity/src -I/home/fenson/aesd-assignments/assignment-5-Fenson-F/assignments-3-and-later-Fenson-F/assignments-3-and-later-Fenson-F/assignment-autotest/. -I/home/fenson/aesd-assignments/assignment-5-Fenson-F/assignments-3-and-later-Fenson-F/assignments-3-and-later-Fenson-F/assignment-autotest/..
+C_INCLUDES = -I/home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/assignment-autotest/Unity/src -I/home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/assignment-autotest/. -I/home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/assignment-autotest/..
 
 C_FLAGS = -pthread -Wall -Werror -g
 
