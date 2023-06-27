@@ -57,17 +57,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-<<<<<<< HEAD
 CMAKE_SOURCE_DIR = /home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F
 
 # The top-level build directory on which CMake was run.
 CMAKE_BINARY_DIR = /home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/build
-=======
-CMAKE_SOURCE_DIR = /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F
-
-# The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/build
->>>>>>> 4d3cdb69f08954fbce6baee3e44b80a5395ce581
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -139,24 +132,14 @@ install/strip/fast: preinstall/fast
 
 # The main all target
 all: cmake_check_build_system
-<<<<<<< HEAD
 	cd /home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/build/CMakeFiles /home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/build/assignment-autotest/Unity//CMakeFiles/progress.marks
 	cd /home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 assignment-autotest/Unity/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/build/CMakeFiles 0
-=======
-	cd /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/build/CMakeFiles /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/build/assignment-autotest/Unity//CMakeFiles/progress.marks
-	cd /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 assignment-autotest/Unity/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/build/CMakeFiles 0
->>>>>>> 4d3cdb69f08954fbce6baee3e44b80a5395ce581
 .PHONY : all
 
 # The main clean target
 clean:
-<<<<<<< HEAD
 	cd /home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 assignment-autotest/Unity/clean
-=======
-	cd /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 assignment-autotest/Unity/clean
->>>>>>> 4d3cdb69f08954fbce6baee3e44b80a5395ce581
 .PHONY : clean
 
 # The main clean target
@@ -165,29 +148,17 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-<<<<<<< HEAD
 	cd /home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 assignment-autotest/Unity/preinstall
-=======
-	cd /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 assignment-autotest/Unity/preinstall
->>>>>>> 4d3cdb69f08954fbce6baee3e44b80a5395ce581
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-<<<<<<< HEAD
 	cd /home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 assignment-autotest/Unity/preinstall
-=======
-	cd /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 assignment-autotest/Unity/preinstall
->>>>>>> 4d3cdb69f08954fbce6baee3e44b80a5395ce581
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-<<<<<<< HEAD
 	cd /home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
-=======
-	cd /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
->>>>>>> 4d3cdb69f08954fbce6baee3e44b80a5395ce581
 .PHONY : depend
 
 # Help Target
@@ -213,10 +184,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-<<<<<<< HEAD
 	cd /home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
-=======
-	cd /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
->>>>>>> 4d3cdb69f08954fbce6baee3e44b80a5395ce581
 .PHONY : cmake_check_build_system
 

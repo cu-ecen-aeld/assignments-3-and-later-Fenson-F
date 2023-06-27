@@ -54,17 +54,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-<<<<<<< HEAD
 CMAKE_SOURCE_DIR = /home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F
 
 # The top-level build directory on which CMake was run.
 CMAKE_BINARY_DIR = /home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/build
-=======
-CMAKE_SOURCE_DIR = /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F
-
-# The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/build
->>>>>>> 4d3cdb69f08954fbce6baee3e44b80a5395ce581
 
 #=============================================================================
 # Directory level rules for the build root directory
@@ -135,24 +128,14 @@ assignment-autotest/Unity/src/clean: assignment-autotest/Unity/src/CMakeFiles/un
 assignment-autotest/CMakeFiles/assignment-autotest.dir/all: assignment-autotest/Unity/src/CMakeFiles/unity.dir/all
 	$(MAKE) $(MAKESILENT) -f assignment-autotest/CMakeFiles/assignment-autotest.dir/build.make assignment-autotest/CMakeFiles/assignment-autotest.dir/depend
 	$(MAKE) $(MAKESILENT) -f assignment-autotest/CMakeFiles/assignment-autotest.dir/build.make assignment-autotest/CMakeFiles/assignment-autotest.dir/build
-<<<<<<< HEAD
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/build/CMakeFiles --progress-num=1,2,3,4,5,6,7,8 "Built target assignment-autotest"
-=======
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/build/CMakeFiles --progress-num=1,2,3,4,5,6,7,8 "Built target assignment-autotest"
->>>>>>> 4d3cdb69f08954fbce6baee3e44b80a5395ce581
 .PHONY : assignment-autotest/CMakeFiles/assignment-autotest.dir/all
 
 # Build rule for subdir invocation for target.
 assignment-autotest/CMakeFiles/assignment-autotest.dir/rule: cmake_check_build_system
-<<<<<<< HEAD
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/build/CMakeFiles 10
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 assignment-autotest/CMakeFiles/assignment-autotest.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/build/CMakeFiles 0
-=======
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/build/CMakeFiles 10
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 assignment-autotest/CMakeFiles/assignment-autotest.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/build/CMakeFiles 0
->>>>>>> 4d3cdb69f08954fbce6baee3e44b80a5395ce581
 .PHONY : assignment-autotest/CMakeFiles/assignment-autotest.dir/rule
 
 # Convenience name for target.
@@ -171,24 +154,14 @@ assignment-autotest/CMakeFiles/assignment-autotest.dir/clean:
 assignment-autotest/Unity/src/CMakeFiles/unity.dir/all:
 	$(MAKE) $(MAKESILENT) -f assignment-autotest/Unity/src/CMakeFiles/unity.dir/build.make assignment-autotest/Unity/src/CMakeFiles/unity.dir/depend
 	$(MAKE) $(MAKESILENT) -f assignment-autotest/Unity/src/CMakeFiles/unity.dir/build.make assignment-autotest/Unity/src/CMakeFiles/unity.dir/build
-<<<<<<< HEAD
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/build/CMakeFiles --progress-num=9,10 "Built target unity"
-=======
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/build/CMakeFiles --progress-num=9,10 "Built target unity"
->>>>>>> 4d3cdb69f08954fbce6baee3e44b80a5395ce581
 .PHONY : assignment-autotest/Unity/src/CMakeFiles/unity.dir/all
 
 # Build rule for subdir invocation for target.
 assignment-autotest/Unity/src/CMakeFiles/unity.dir/rule: cmake_check_build_system
-<<<<<<< HEAD
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/build/CMakeFiles 2
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 assignment-autotest/Unity/src/CMakeFiles/unity.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/build/CMakeFiles 0
-=======
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/build/CMakeFiles 2
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 assignment-autotest/Unity/src/CMakeFiles/unity.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/build/CMakeFiles 0
->>>>>>> 4d3cdb69f08954fbce6baee3e44b80a5395ce581
 .PHONY : assignment-autotest/Unity/src/CMakeFiles/unity.dir/rule
 
 # Convenience name for target.

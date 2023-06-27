@@ -53,17 +53,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-<<<<<<< HEAD
 CMAKE_SOURCE_DIR = /home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F
 
 # The top-level build directory on which CMake was run.
 CMAKE_BINARY_DIR = /home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/build
-=======
-CMAKE_SOURCE_DIR = /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F
-
-# The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/build
->>>>>>> 4d3cdb69f08954fbce6baee3e44b80a5395ce581
 
 # Include any dependencies generated for this target.
 include assignment-autotest/Unity/src/CMakeFiles/unity.dir/depend.make
@@ -77,7 +70,6 @@ include assignment-autotest/Unity/src/CMakeFiles/unity.dir/progress.make
 include assignment-autotest/Unity/src/CMakeFiles/unity.dir/flags.make
 
 assignment-autotest/Unity/src/CMakeFiles/unity.dir/unity.c.o: assignment-autotest/Unity/src/CMakeFiles/unity.dir/flags.make
-<<<<<<< HEAD
 assignment-autotest/Unity/src/CMakeFiles/unity.dir/unity.c.o: /home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/assignment-autotest/Unity/src/unity.c
 assignment-autotest/Unity/src/CMakeFiles/unity.dir/unity.c.o: assignment-autotest/Unity/src/CMakeFiles/unity.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object assignment-autotest/Unity/src/CMakeFiles/unity.dir/unity.c.o"
@@ -90,20 +82,6 @@ assignment-autotest/Unity/src/CMakeFiles/unity.dir/unity.c.i: cmake_force
 assignment-autotest/Unity/src/CMakeFiles/unity.dir/unity.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/unity.dir/unity.c.s"
 	cd /home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/build/assignment-autotest/Unity/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/assignment-autotest/Unity/src/unity.c -o CMakeFiles/unity.dir/unity.c.s
-=======
-assignment-autotest/Unity/src/CMakeFiles/unity.dir/unity.c.o: /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/assignment-autotest/Unity/src/unity.c
-assignment-autotest/Unity/src/CMakeFiles/unity.dir/unity.c.o: assignment-autotest/Unity/src/CMakeFiles/unity.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object assignment-autotest/Unity/src/CMakeFiles/unity.dir/unity.c.o"
-	cd /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/build/assignment-autotest/Unity/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT assignment-autotest/Unity/src/CMakeFiles/unity.dir/unity.c.o -MF CMakeFiles/unity.dir/unity.c.o.d -o CMakeFiles/unity.dir/unity.c.o -c /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/assignment-autotest/Unity/src/unity.c
-
-assignment-autotest/Unity/src/CMakeFiles/unity.dir/unity.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/unity.dir/unity.c.i"
-	cd /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/build/assignment-autotest/Unity/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/assignment-autotest/Unity/src/unity.c > CMakeFiles/unity.dir/unity.c.i
-
-assignment-autotest/Unity/src/CMakeFiles/unity.dir/unity.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/unity.dir/unity.c.s"
-	cd /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/build/assignment-autotest/Unity/src && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/assignment-autotest/Unity/src/unity.c -o CMakeFiles/unity.dir/unity.c.s
->>>>>>> 4d3cdb69f08954fbce6baee3e44b80a5395ce581
 
 # Object files for target unity
 unity_OBJECTS = \
@@ -115,33 +93,19 @@ unity_EXTERNAL_OBJECTS =
 assignment-autotest/Unity/src/libunity.a: assignment-autotest/Unity/src/CMakeFiles/unity.dir/unity.c.o
 assignment-autotest/Unity/src/libunity.a: assignment-autotest/Unity/src/CMakeFiles/unity.dir/build.make
 assignment-autotest/Unity/src/libunity.a: assignment-autotest/Unity/src/CMakeFiles/unity.dir/link.txt
-<<<<<<< HEAD
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C static library libunity.a"
 	cd /home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/build/assignment-autotest/Unity/src && $(CMAKE_COMMAND) -P CMakeFiles/unity.dir/cmake_clean_target.cmake
 	cd /home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/build/assignment-autotest/Unity/src && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/unity.dir/link.txt --verbose=$(VERBOSE)
-=======
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C static library libunity.a"
-	cd /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/build/assignment-autotest/Unity/src && $(CMAKE_COMMAND) -P CMakeFiles/unity.dir/cmake_clean_target.cmake
-	cd /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/build/assignment-autotest/Unity/src && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/unity.dir/link.txt --verbose=$(VERBOSE)
->>>>>>> 4d3cdb69f08954fbce6baee3e44b80a5395ce581
 
 # Rule to build all files generated by this target.
 assignment-autotest/Unity/src/CMakeFiles/unity.dir/build: assignment-autotest/Unity/src/libunity.a
 .PHONY : assignment-autotest/Unity/src/CMakeFiles/unity.dir/build
 
 assignment-autotest/Unity/src/CMakeFiles/unity.dir/clean:
-<<<<<<< HEAD
 	cd /home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/build/assignment-autotest/Unity/src && $(CMAKE_COMMAND) -P CMakeFiles/unity.dir/cmake_clean.cmake
 .PHONY : assignment-autotest/Unity/src/CMakeFiles/unity.dir/clean
 
 assignment-autotest/Unity/src/CMakeFiles/unity.dir/depend:
 	cd /home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F /home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/assignment-autotest/Unity/src /home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/build /home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/build/assignment-autotest/Unity/src /home/fenson/aesd-assignments/assignment-3-Fenson-F/assignments-3-and-later-Fenson-F/build/assignment-autotest/Unity/src/CMakeFiles/unity.dir/DependInfo.cmake --color=$(COLOR)
-=======
-	cd /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/build/assignment-autotest/Unity/src && $(CMAKE_COMMAND) -P CMakeFiles/unity.dir/cmake_clean.cmake
-.PHONY : assignment-autotest/Unity/src/CMakeFiles/unity.dir/clean
-
-assignment-autotest/Unity/src/CMakeFiles/unity.dir/depend:
-	cd /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/assignment-autotest/Unity/src /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/build /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/build/assignment-autotest/Unity/src /home/fenson/aesd-assignments/assignment-5-Fenson-F/assignment-5-1/assignments-3-and-later-Fenson-F/build/assignment-autotest/Unity/src/CMakeFiles/unity.dir/DependInfo.cmake --color=$(COLOR)
->>>>>>> 4d3cdb69f08954fbce6baee3e44b80a5395ce581
 .PHONY : assignment-autotest/Unity/src/CMakeFiles/unity.dir/depend
 
