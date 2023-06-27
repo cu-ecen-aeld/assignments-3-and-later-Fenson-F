@@ -15,7 +15,6 @@ FINDER_APP_DIR=$(realpath $(dirname $0))
 KERNEL_PATCH=${FINDER_APP_DIR}/kernel-patch/
 ARCH=arm64
 CROSS_COMPILE=aarch64-none-linux-gnu-
-CROSS_COMPILE_LIB=${FINDER_APP_DIR}/arm-cross-compiler/install/gcc-arm-10.2-2020.11-x86_64-aarch64-none-linux-gnu/aarch64-none-linux-gnu/libc
 
 if [ $# -lt 1 ]
 then
@@ -107,13 +106,16 @@ ${CROSS_COMPILE}readelf -a bin/busybox | grep "Shared library"
 
 # TODO: Add library dependencies to rootfs
 # Add program interpreter to lib and add libraries to lib64
-#cp -f ${CROSS_COMPILE_LIB}/ld-linux-aarch64.so.1 ${OUTDIR}/rootfs/lib
-cp -f ${CROSS_COMPILE_LIB}/lib/ld-linux-aarch64.so.1 ${OUTDIR}/rootfs/lib
-#cp -f ${CROSS_COMPILE_LIB}/lib64/* ${OUTDIR}/rootfs/lib64
+export SYSROOT=$(${CROSS_COMPILE}gcc -print-sysroot)
 
-cp -f -L ${CROSS_COMPILE_LIB}/libm.so.6 ${OUTDIR}/rootfs/lib64
-cp -f -L ${CROSS_COMPILE_LIB}/libresolv.so.2 ${OUTDIR}/rootfs/lib64
-cp -f -L ${CROSS_COMPILE_LIB}/libc.so.6 ${OUTDIR}/rootfs/lib64
+sudo	cp -aL "${SYSROOT}/lib/ld-linux-aarch64.so.1" "${OUTDIR}/rootfs/lib"
+sudo	cp -aL "${SYSROOT}/lib64/libm.so.6" "${OUTDIR}/rootfs/lib64"
+sudo	cp -aL "${SYSROOT}/lib64/libresolv.so.2" "${OUTDIR}/rootfs/lib64"
+sudo	cp -aL "${SYSROOT}/lib64/libc.so.6" "${OUTDIR}/rootfs/lib64"
+
+#cp -f -L ${CROSS_COMPILE_LIB}/libm.so.6 ${OUTDIR}/rootfs/lib64
+#cp -f -L ${CROSS_COMPILE_LIB}/libresolv.so.2 ${OUTDIR}/rootfs/lib64
+#cp -f -L ${CROSS_COMPILE_LIB}/libc.so.6 ${OUTDIR}/rootfs/lib64
 
 # TODO: Make device nodes
 cd "$OUTDIR/rootfs"
@@ -121,15 +123,14 @@ sudo mknod -m 666 dev/null c 1 3
 sudo mknod -m 600 dev/console c 5 1
 
 # TODO: Clean and build the writer utility
-cd "$FINDER_APP_DIR"
+cd $FINDER_APP_DIR
 if [ -f "writer" ]
- then
-   rm writer
-   echo "Previous writer executable deleted"
- fi
+    then 
+        rm writer
+        echo "Previous writer removed"
+    fi
 ${CROSS_COMPILE}gcc writer.c -o writer
-echo "Writer executable created. File Details:"
-file writer
+echo "Writer executable created"
 
 # TODO: Copy the finder related scripts and executables to the /home directory
 # on the target rootfs

@@ -1,19 +1,21 @@
 SRC := writer.c 
 TARGET = writer
-OBJS := $(SRC:.c=.o)
+#OBJS := $(SRC:.c=.o)
 
-CC_host = gcc
-CC_xcompile = /home/fenson/gcc-arm-aarch64-none-linux-gnu/usr/bin/aarch64-none-linux-gnu-gcc
+#CC_host = gcc
+CC= $(CROSS_COMPILE)gcc
 
-Sources = writer.c
+#Sources = writer.c
 
 all: $(TARGET)
 
-$(TARGET) : $(OBJS)
-	$(CC_host) $(CFLAGS) $(INCLUDES) $(OBJS) -o $(TARGET) $(LDFLAGS)
-
-CROSS_COMPILE aarch64-none-linux-gnu- : $(OBJS)
-	/home/fenson/gcc-arm-aarch64-none-linux-gnu/usr/bin/aarch64-none-linux-gnu-gcc writer.c -o writer
+#$(TARGET) : $(OBJS)
+$(TARGET) :
+	$(CC) $(CFLAGS) $(INCLUDES) $(OBJS) -c $(TARGET).c -o $(TARGET).o
+	$(CC) $(CFLAGS) $(INCLUDES) $(OBJS) -o $(TARGET) $(TARGET).o
+	
+#CROSS_COMPILE aarch64-none-linux-gnu- : $(OBJS)
+#	aarch64-none-linux-gnu- writer.c -o writer
 
 .PHONY : clean
 
