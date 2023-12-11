@@ -1,9 +1,9 @@
 
 TARGET ?= aesdsocket
 CC ?= $(CROSS_COMPILE)gcc
-CFLAGS ?= -Wall -Werror -g -O0 
-LDFLAGS ?= -lpthread -lrt
-RM ?= rm -f
+CFLAGS = -Wall -Werror -g -O0 
+LDFLAGS = -lpthread 
+RM = rm -f
 
 .PHONY : all
 
