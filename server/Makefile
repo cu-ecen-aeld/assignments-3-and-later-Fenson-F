@@ -2,7 +2,7 @@
 TARGET = aesdsocket
 CC= $(CROSS_COMPILE)gcc
 CFLAGS = -Wall -Werror -g -O0 
-LIB= -lpthread
+LIB= -lpthread -lrt
 
 .PHONY : all
 
