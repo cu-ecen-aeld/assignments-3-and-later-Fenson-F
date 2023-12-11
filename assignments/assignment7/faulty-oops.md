@@ -1,8 +1,8 @@
-## Assignment 7 - Faulty analysis
+## Assignment 7 - Faulty Analysis
 
-Running 'echo "hello_world" > /dev/faulty' in the qemu image results in the following kernel oops:
+Running `echo "hello_world" > /dev/faulty` in the qemu image results in the following kernel oops:
 
-,,,
+```
 # echo "hello_world" > /dev/faulty
 Unable to handle kernel NULL pointer dereference at virtual address 0000000000000000
 Mem abort info:
@@ -49,20 +49,19 @@ Code: d2800001 d2800000 d503233f d50323bf (b900003f)
 
 Welcome to Buildroot
 buildroot login:
-''' 
+``` 
 
 The error output clearly states that the error occured due to a NULL pointer dereference. Specifically in the line: 
-'''
+```
 Unable to handle kernel NULL pointer dereference at virtual address 0000000000000000
-'''
+```
 The fact the virtual address is 0000000000000000 in this line also confirms that this is a NULL pointer reference.
 
-Looking further into the error message, the first call trace line 'faulty_write+0x14/0x20 [faulty]' confirms that it was 'faulty' that invoked it, 
-and more specifically while invoking the function 'faulty_write'. The segment '0x14/0x20' of this line indicates that it occured 14 bytes into the function which is 20 bytes long. 
+Looking further into the error message, the first call trace line `faulty_write+0x14/0x20 [faulty]` confirms that it was `faulty` that invoked it, and more specifically while invoking the function `faulty_write`. The segment `0x14/0x20` of this line indicates that it occured 14 bytes into the function which is 20 bytes long. 
 
 Running objdump produces the following object file
 
-''' 
+``` 
 ./buildroot/output/host/bin/aarch64-linux-objdump -S ./buildroot/output/target/lib/modules/5.15.18/extra/faulty.ko
 
 ./buildroot/output/target/lib/modules/5.15.18/extra/faulty.ko:     file format elf64-littleaarch64
@@ -197,8 +196,6 @@ Disassembly of section .text.ftrace_trampoline:
 0000000000000000 <.text.ftrace_trampoline>:
 	...
 
-'''
+```
 
-The line we're interested in is '14:	b900003f 	str	wzr, [x1]', as that is address 0x14 of faulty_write. 
-'str wzr, [x1]' indicates that it is trying to reference/'store' the address in register '[x1]', which is flagged as a zero register.
-Looking back at the kernel oops, the register '[x1]' contains '0000000000000000', which confirms that it is a zero/NULL register.
+The line we're interested in is `14:	b900003f 	str	wzr, [x1]`, as that is address 0x14 of faulty_write. `str wzr, [x1]` indicates that it is trying to reference/'store' the address in register `[x1]`, which is flagged as a zero register. Looking back at the kernel oops, the register `[x1]` contains `0000000000000000`, which confirms that it is a zero/NULL register.
