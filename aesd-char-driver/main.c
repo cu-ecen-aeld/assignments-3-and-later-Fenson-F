@@ -131,14 +131,15 @@ ssize_t aesd_write(struct file *filp, const char __user *buf, size_t count,
 
      copy_from_user (__user,count);
      */
-    struct aesd_dev *dev = filp->private_data;
+    struct aesd_dev *dev;
     struct aesd_buffer_entry new_entry;
     char *userdata;
     ssize_t ret;
-    ssize_t index = 0;
-    ssize_t entry_size = 0;
+    size_t index = 0;
+    size_t entry_size = 0;
     ssize_t newlinefound =  0;
 
+    dev = filp->private_data;
     //get data from user first
     userdata = kmalloc(count, GFP_KERNEL);
     if(userdata == NULL){
@@ -161,9 +162,10 @@ ssize_t aesd_write(struct file *filp, const char __user *buf, size_t count,
     }
     //check for newline
 
-    while((index < count)&&(newlinefound == 0)){
+    while((index < count)){
         if(userdata[index] == '\n'){
             newlinefound = 1;
+            break;
         }
 
         //still want to add 1 even if \n has been found to account for it
@@ -171,7 +173,7 @@ ssize_t aesd_write(struct file *filp, const char __user *buf, size_t count,
     }
 
     if(newlinefound == 1){
-        entry_size = index;
+        entry_size = index +1;
     }
     else {
         entry_size = count;
@@ -179,7 +181,7 @@ ssize_t aesd_write(struct file *filp, const char __user *buf, size_t count,
 
     //reallocate buffer now that size is known
 
-    if(dev->wbuffer == 0) {
+    if(dev->size == 0) {
         dev->wbuffer = kmalloc(entry_size, GFP_KERNEL);
         if( dev->wbuffer== NULL) {
         PDEBUG("Failure: Could not allocate buffer size \n");
@@ -198,8 +200,8 @@ ssize_t aesd_write(struct file *filp, const char __user *buf, size_t count,
     }
 
     memcpy(dev->wbuffer + dev->size, userdata, entry_size);
-    dev->size = dev->size + entry_size;
-    kfree(userdata);
+    dev->size += entry_size;
+    //kfree(userdata);
 
     if(newlinefound == 1){
 
@@ -209,7 +211,7 @@ ssize_t aesd_write(struct file *filp, const char __user *buf, size_t count,
         aesd_circular_buffer_add_entry(&dev->cbuffer, &new_entry);
         //kfree(new_entry);
 
-        dev->wbuffer= NULL;
+        //dev->wbuffer= NULL;
         dev->size = 0;
         newlinefound = 0;
 
