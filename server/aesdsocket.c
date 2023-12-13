@@ -23,9 +23,21 @@
 #define PORT 9000
 #define BUFFERSIZE 20480 //20kB
 
+//A8
+#define USE_AESD_CHAR_DEVICE = 1
+
 //Global Variables
-char serverfile_loc[]= "/tmp/var/aesdsocketdata";
-char serverfile_path[]= "/tmp/var/";
+//A8 -> change files
+#ifdef USE_AESD_CHAR_DEVICE
+    char serverfile_loc[]= "/dev/aesdchar";
+    char serverfile_path[]= "/dev/";
+#else
+    char serverfile_loc[]= "/tmp/var/aesdsocketdata";
+    char serverfile_path[]= "/tmp/var/";
+
+    pthread_t timerthread = {0};
+#endif
+
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 FILE *serverfile = NULL;
@@ -34,8 +46,11 @@ int serverfd;
 int backlog = 5; //number of clients
 
 volatile sig_atomic_t tstatus= 0;
-pthread_t timerthread = {0};
+
+
+
 pthread_t jointhread = {0};
+
 SLIST_HEAD(llisthead , thread_data) head;
 struct thread_data *newclientthread = NULL;
 
@@ -283,12 +298,17 @@ static void sig_handler(int sigflag){
     }
 
     //close file descriptors and threads
-    pthread_cancel(timerthread);
+    #ifndef USE_AESD_CHAR_DEVICE
+        pthread_cancel(timerthread);
+    #endif
+
     pthread_cancel(jointhread);
     delete_thread_data (newclientthread);
     
     close(serverfd);
-    remove(serverfile_loc);
+    #ifndef USE_AESD_CHAR_DEVICE
+        remove(serverfile_loc);
+    #endif
     pthread_mutex_destroy(&mutex);    
 
     //close syslogging
@@ -307,10 +327,9 @@ int main(int argc, char **argv){
     int daemonize;
     
     int rclisten;
-    int headret;
     int tailret;
     int filesetup;
-    int joinret;
+   
     SLIST_INIT(&head);
 
     openlog(NULL, 0, LOG_USER);
@@ -407,21 +426,27 @@ int main(int argc, char **argv){
         }
     }
     
-    //Use the head of the linked list to write the timer thread
+    //Create the timer and join thread
+    #ifndef USE_AESD_CHAR_DEVICE
+    int headret;
     headret = pthread_create(&timerthread, NULL, thread_timer_func, NULL);
     if(headret != 0 ){
         syslog(LOG_ERR, "Failed to create timer thread%s",strerror(errno));
         printf("Failed to create timer thread%s\n", strerror(errno));
         exit(EXIT_FAILURE);
     }
+    #endif
 
     //start join thread seperately
+    int joinret;
+
     joinret  = pthread_create(&jointhread, NULL, thread_join_func, NULL);
     if(joinret != 0 ){
         syslog(LOG_ERR, "Failed to create join thread%s",strerror(errno));
         printf("Failed to create join thread%s\n", strerror(errno));
         exit(EXIT_FAILURE);
     }
+
 
     // While loop that listens for new sockets before entering inner loop to receive data
     while(runflag){

@@ -8,6 +8,8 @@
 #ifndef AESD_CHAR_DRIVER_AESDCHAR_H_
 #define AESD_CHAR_DRIVER_AESDCHAR_H_
 
+#include "aesd-circular-buffer.h"
+
 #define AESD_DEBUG 1  //Remove comment on this line to enable debug
 
 #undef PDEBUG             /* undef it, just in case */
@@ -32,7 +34,11 @@ struct aesd_dev
       // Added
      struct mutex lock;
      struct aesd_circular_buffer cbuffer;
-     struct aesd_buffer_entry ebuffer; //dev entry buffer for future writes
+     //dev entry buffer for future writes
+     //struct aesd_buffer_entry ebuffer; <-memcopy pulled up warning due to buffptr being a const
+     size_t size;
+     char* wbuffer;
+     
 
 };
 
