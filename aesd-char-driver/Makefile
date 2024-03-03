@@ -1,7 +1,7 @@
 # See example Makefile from scull project
 # Comment/uncomment the following line to disable/enable debugging
 #DEBUG = y
-export CC=x86_64-linux-gnu-gcc-13
+#export CC=x86_64-linux-gnu-gcc-13
 
 
 # Add your debugging flag (or not) to CFLAGS
