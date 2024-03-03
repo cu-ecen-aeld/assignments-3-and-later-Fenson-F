@@ -21,26 +21,28 @@
 #include <stdbool.h>
 
 #define PORT 9000
-#define BUFFERSIZE 20480 //20kB
+#define BUFFERSIZE 2048 //20kB
 
 //A8
-#define USE_AESD_CHAR_DEVICE = 1
+#define USE_AESD_CHAR_DEVICE 1;
+
 
 //Global Variables
 //A8 -> change files
+FILE * serverfile;
 #ifdef USE_AESD_CHAR_DEVICE
-    char serverfile_loc[]= "/dev/aesdchar";
-    char serverfile_path[]= "/dev/";
+    #define SERVER_FILE  "/dev/aesdchar"
 #else
-    char serverfile_loc[]= "/tmp/var/aesdsocketdata";
-    char serverfile_path[]= "/tmp/var/";
-
+    char serverfile_loc[]= "/var/tmp/aesdsocketdata";
+    char serverfile_path[]= "/var/tmp/";
+    #define SERVER_FILE  "/var/tmp/aesdsocketdata"
     pthread_t timerthread = {0};
 #endif
 
-pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+//pthread_mutex_t listmutex;
+pthread_mutex_t filemutex;
 
-FILE *serverfile = NULL;
+//FILE *serverfile = NULL;
 struct sockaddr_in serveraddr, clientaddr;
 int serverfd; 
 int backlog = 5; //number of clients
@@ -87,7 +89,7 @@ void* thread_timer_func(void* timerparam){
         buff = localtime(&t);
         if(buff == NULL){
             syslog(LOG_ERR, "Failure with getting local time: %s", strerror(errno));
-            printf("Timer failure with getting local time \n");
+            fprintf(stderr,"Timer failure with getting local time \n");
             break;
         }
         
@@ -95,20 +97,20 @@ void* thread_timer_func(void* timerparam){
 
         if(ret==0){
             syslog(LOG_ERR, "Failure with timer string: %s", strerror(errno));
-            printf("Timer string failure \n");
+            fprintf(stderr,"Timer string failure \n");
             break;
         }
 
-        printf("Timer output: %s \n", output);
+        fprintf(stderr,"Timer output: %s \n", output);
 
-        pthread_mutex_lock(&mutex);
+        pthread_mutex_lock(&filemutex);
 
-        serverfile = fopen(serverfile_loc, "a");
+        serverfile = fopen(SERVER_FILE, "a+");
         if (serverfile < 0)
         {  
             syslog(LOG_ERR, "Failed to open file to write timer: %s \n", strerror(errno));
-            printf("Failed to open file in timer \n");
-            pthread_mutex_unlock(&mutex);
+            fprintf(stderr,"Failed to open file in timer \n");
+            pthread_mutex_unlock(&filemutex);
             break;
         }
 
@@ -116,7 +118,7 @@ void* thread_timer_func(void* timerparam){
         fprintf(serverfile,"%s", output);
         
         fclose(serverfile);
-        pthread_mutex_unlock(&mutex);
+        pthread_mutex_unlock(&filemutex);
         
     }
 
@@ -140,11 +142,14 @@ void* thread_join_func(void* threadparam){
         int joinsize=0;
 
         //check each item in the list for any completed and store
+        //pthread_mutex_lock(&listmutex);
+
         SLIST_FOREACH(currentthread, &head, node){
             if(currentthread->complete == 1) {
+                
                 retjoin = pthread_join(currentthread->thread, &retthread);
                 if (retjoin != 0){
-                    printf("Thread did not join succesfully\n");
+                    fprintf(stderr,"Thread did not join succesfully\n");
                 }
                 else {
                     printf("Joined thread from client %d \n", currentthread->clientfd);
@@ -153,6 +158,8 @@ void* thread_join_func(void* threadparam){
                     removethread[joinsize-1] = currentthread;
                     
                 }
+
+                
             }
         }
 
@@ -162,6 +169,8 @@ void* thread_join_func(void* threadparam){
             SLIST_REMOVE(&head, removethread[i], thread_data, node);
             delete_thread_data(removethread[i]);
         }
+
+        //pthread_mutex_unlock(&listmutex);
 
         if(removethread!=NULL)
         {
@@ -194,8 +203,8 @@ void *thread_client_func(void* threadparam){
         //check if full packet was received until you find a newline character
         if(buffer_recv[recvfd-1]!='\n')
         {
-            //printf("Received packet of size %zu \n", recvfd);
-            //printf("%s",buffer_recv);
+            //fprintf(stderr,"Received packet of size %zu \n", recvfd);
+            //fprintf(stderr,"%s",buffer_recv);
             printf("Did not receive full packet.\n");
             for(ssize_t i=0; i < (recvfd); i++)
             {
@@ -210,7 +219,7 @@ void *thread_client_func(void* threadparam){
         {
             //printf("Received packet of size %zu \n", recvfd);
             //printf("Received full packet of size %zu \n", (recvfd + packetsize));
-            printf("Received full packet \n");
+           printf("Received full packet \n");
                 
             for(ssize_t i=0; i < (recvfd); i++)
             {
@@ -222,14 +231,15 @@ void *thread_client_func(void* threadparam){
             buffer_packet[packetsize] = '\0';
 
             //open file to only append
-            pthread_mutex_lock(&mutex);
+            pthread_mutex_lock(&filemutex);
 
             printf("Opening file \n");
-            serverfile = fopen(serverfile_loc, "a");
+            serverfile = fopen(SERVER_FILE, "a+");
             if (serverfile < 0)
             {  
                 syslog(LOG_ERR, "Failed to open file to write: %s", strerror(errno));
-                printf("Failed to open file \n");
+                fprintf(stderr,"Failed to open file \n");
+                pthread_mutex_unlock(&filemutex);
                 goto conn_fail;
             }
 
@@ -238,26 +248,24 @@ void *thread_client_func(void* threadparam){
             fclose(serverfile);
 
             //open file to read only
-            serverfile = fopen(serverfile_loc, "r");
+            serverfile = fopen(SERVER_FILE, "r");
             filesize = fread(buffer_send, 1, BUFFERSIZE, serverfile);
             syslog(LOG_INFO, "Success: Read file");
             printf("Success, read file.\n");
             fclose(serverfile);
 
-            pthread_mutex_unlock(&mutex);
-
-
             //Sending file to client
             syslog(LOG_INFO, "Sending file to client");
             printf("Sending file to client \n");
-            //printf("Sending: %s", buffer_send);
+            //fprintf(stderr,"Sending: %s", buffer_send);
             sendret = send(clientthreaddata->clientfd,buffer_send,filesize,0);
             if(sendret == -1)
             {
                 syslog(LOG_ERR, "Failed to send file to client: %s", strerror(errno));
-                printf("Failed to send file to client \n");
+                fprintf(stderr,"Failed to send file to client \n");
             }
-                
+            
+            pthread_mutex_unlock(&filemutex);
             packetsize = 0;
             
         }             
@@ -269,7 +277,7 @@ void *thread_client_func(void* threadparam){
     return threadparam;
 
     conn_fail:
-        pthread_mutex_unlock (&mutex);
+        //pthread_mutex_unlock (&filemutex);
         clientthreaddata->complete = 1;
 
         return threadparam;
@@ -291,11 +299,14 @@ static void sig_handler(int sigflag){
 
     struct thread_data *threaddelptr = NULL;
 
+    //pthread_mutex_lock(&listmutex);
+
     while(!SLIST_EMPTY(&head)){
         threaddelptr = SLIST_FIRST(&head);
         SLIST_REMOVE(&head, threaddelptr, thread_data, node);
         delete_thread_data(threaddelptr);
     }
+    //pthread_mutex_unlock(&listmutex);
 
     //close file descriptors and threads
     #ifndef USE_AESD_CHAR_DEVICE
@@ -306,10 +317,13 @@ static void sig_handler(int sigflag){
     delete_thread_data (newclientthread);
     
     close(serverfd);
+
     #ifndef USE_AESD_CHAR_DEVICE
-        remove(serverfile_loc);
+    remove(SERVER_FILE);
     #endif
-    pthread_mutex_destroy(&mutex);    
+
+    pthread_mutex_destroy(&filemutex);
+    //pthread_mutex_destroy(&listmutex);     
 
     //close syslogging
     syslog(LOG_INFO, "Finished Logging for aesdsocket");
@@ -328,9 +342,10 @@ int main(int argc, char **argv){
     
     int rclisten;
     int tailret;
-    int filesetup;
+    
    
     SLIST_INIT(&head);
+    pthread_mutex_init(&filemutex, NULL);
 
     openlog(NULL, 0, LOG_USER);
     syslog(LOG_INFO, "Start Logging for aesdsocket\n");
@@ -339,7 +354,7 @@ int main(int argc, char **argv){
     //daemonize
     if (argc > 2)
     {
-        printf("Too many arguments. Try again. \n");
+        fprintf(stderr,"Too many arguments. Try again. \n");
         exit(EXIT_FAILURE);
     }
     else if (argc==2 && strcmp(argv[1],"-d")==0)
@@ -349,7 +364,7 @@ int main(int argc, char **argv){
         if (daemonize==-1)
         {
             syslog(LOG_ERR, "Failed starting daemon mode: %s", strerror(errno));
-            printf("Failed to start in daemon mode \n");
+            fprintf(stderr,"Failed to start in daemon mode \n");
             exit(EXIT_FAILURE);
         }
          
@@ -359,13 +374,13 @@ int main(int argc, char **argv){
     if(signal(SIGINT,sig_handler)==SIG_ERR)
     {   
         syslog(LOG_ERR, "SIGINIT failed");
-        printf("Sigint failed \n");
+        fprintf(stderr,"Sigint failed \n");
         exit(EXIT_FAILURE);
     }
     else if(signal(SIGTERM,sig_handler)==SIG_ERR)
     {
         syslog(LOG_ERR, "SIGTERM failed");
-        printf("Sigterm failed \n");
+        fprintf(stderr,"Sigterm failed \n");
         exit(EXIT_FAILURE);
     }
 
@@ -375,7 +390,7 @@ int main(int argc, char **argv){
     if(serverfd < 0)
     {
         syslog(LOG_ERR, "Socket Error: %s", strerror(errno));
-        printf("Socket Creation Failed \n");
+        fprintf(stderr,"Socket Creation Failed \n");
         exit(EXIT_FAILURE);
     }
 
@@ -390,7 +405,7 @@ int main(int argc, char **argv){
     if(checkreuse == -1)
     {
         syslog(LOG_WARNING, "Failed to set socket to previously used address: %s", strerror(errno));
-        printf("Warning: Failed to reuse socket address");
+        fprintf(stderr,"Warning: Failed to reuse socket address");
     }
 
     //binding (assigning address to socket)
@@ -398,54 +413,57 @@ int main(int argc, char **argv){
     rcbind = bind(serverfd, (struct sockaddr*)&serveraddr, sizeof(serveraddr));
     if (rcbind == -1){
         syslog(LOG_ERR, "Bind failure: %s", strerror(errno));
-        printf("Bind failed \n");
+        fprintf(stderr,"Bind failed \n");
         exit(EXIT_FAILURE);
     }
 
     //create directory if does not exist
-    filesetup=mkdir(serverfile_path,0777);
-    if ((filesetup < 0) && (errno!=EEXIST))
-    {  
-        syslog(LOG_ERR, "Failed to create directory %s", strerror(errno));
-        printf("Failed to create directory %s\n", strerror(errno));
-        exit(EXIT_FAILURE);
-    }
+    #ifndef USE_AESD_CHAR_DEVICE
+    //int filesetup;
+    //filesetup=mkdir(serverfile_path,0777);
+    //if ((filesetup < 0) && (errno!=EEXIST))
+    //{  
+    //    syslog(LOG_ERR, "Failed to create directory %s", strerror(errno));
+    //    fprintf(stderr,"Failed to create directory %s\n", strerror(errno));
+     //   exit(EXIT_FAILURE);
+    //}
     
     //checking if file already exists. If it does, delete before starting loop (assignment specific, may delete in future)
-    if(access(serverfile_loc, F_OK) == 0)
-    {
-        printf("File already exists. Deleting before proceeding.");
-        if(remove(serverfile_loc)!=0)
-        {
-            syslog(LOG_ERR, "Failed to delete file %s", strerror(errno));
-            printf("Failed to delete file %s. Proceeding with program, may be errors. \n", strerror(errno));
-        }
-        else
-        {
-            printf("File deleted succesfully. \n");
-        }
-    }
+    //if(access(serverfile_loc, F_OK) == 0)
+    //{
+    //    fprint("File already exists. Deleting before proceeding.");
+    //    if(remove(serverfile_loc)!=0)
+    //    {
+    //        syslog(LOG_ERR, "Failed to delete file %s", strerror(errno));
+    //        fprintf(stderr,"Failed to delete file %s. Proceeding with program, may be errors. \n", strerror(errno));
+    //    }
+     //   else
+    //    {
+    //        fprintf(stderr,"File deleted succesfully. \n");
+    //    }
+    //}
     
     //Create the timer and join thread
-    #ifndef USE_AESD_CHAR_DEVICE
     int headret;
     headret = pthread_create(&timerthread, NULL, thread_timer_func, NULL);
     if(headret != 0 ){
         syslog(LOG_ERR, "Failed to create timer thread%s",strerror(errno));
-        printf("Failed to create timer thread%s\n", strerror(errno));
+        fprintf(stderr,"Failed to create timer thread%s\n", strerror(errno));
         exit(EXIT_FAILURE);
     }
     #endif
 
     //start join thread seperately
     int joinret;
-
+    //pthread_mutex_lock(&listmutex);
     joinret  = pthread_create(&jointhread, NULL, thread_join_func, NULL);
     if(joinret != 0 ){
         syslog(LOG_ERR, "Failed to create join thread%s",strerror(errno));
-        printf("Failed to create join thread%s\n", strerror(errno));
+        fprintf(stderr,"Failed to create join thread%s\n", strerror(errno));
+        //pthread_mutex_unlock(&listmutex);
         exit(EXIT_FAILURE);
     }
+    //pthread_mutex_unlock(&listmutex);
 
 
     // While loop that listens for new sockets before entering inner loop to receive data
@@ -457,7 +475,7 @@ int main(int argc, char **argv){
         if(rclisten==-1)
         {
             syslog(LOG_ERR, "Failed to listen on socket: %s", strerror(errno));
-            printf("Failed to listen in on socket \n");
+            fprintf(stderr,"Failed to listen in on socket \n");
             close(serverfd);
             exit(EXIT_FAILURE);
         }
@@ -468,7 +486,7 @@ int main(int argc, char **argv){
         if (newclient < 0){
 
             syslog(LOG_ERR, "Failed to accept client: %s", strerror(errno));
-            printf("Failed to accept client \n");
+            fprintf(stderr,"Failed to accept client \n");
             exit(EXIT_FAILURE);
         }
         else
@@ -487,24 +505,25 @@ int main(int argc, char **argv){
             newclientthread->complete=0;
         }
         //add the new connection as the new head to avoid having to keep track of the tail
+        //pthread_mutex_lock(&listmutex);
         SLIST_INSERT_HEAD(&head, newclientthread, node);
 
         tailret  = pthread_create(&newclientthread->thread, NULL, thread_client_func, (void*) newclientthread);
         if(tailret != 0 ){
             syslog(LOG_ERR, "Failed to create client thread %s", strerror(errno));
-            printf("Failed to create client thread %s\n", strerror(errno));
+            fprintf(stderr,"Failed to create client thread %s\n", strerror(errno));
             SLIST_REMOVE(&head, newclientthread, thread_data, node);
             delete_thread_data(newclientthread);
             continue;
             
         }
-
         newclientthread = NULL;
+        //pthread_mutex_unlock(&listmutex);
         
     }
 
     syslog(LOG_DEBUG, "Reached end of main, error in code.");
-    printf("Error in code, reached end of main \n");
+    fprintf(stderr,"Error in code, reached end of main \n");
     exit(EXIT_FAILURE);  
 
 }

@@ -33,11 +33,11 @@ struct aesd_dev
      struct cdev cdev;     /* Char device structure      */
       // Added
      struct mutex lock;
-     struct aesd_circular_buffer cbuffer;
+     struct aesd_circular_buffer circular_buffer;
      //dev entry buffer for future writes
-     //struct aesd_buffer_entry ebuffer; <-memcopy pulled up warning due to buffptr being a const
-     size_t size;
-     char* wbuffer;
+     struct aesd_buffer_entry wr_buff_entry; //<-memcopy pulled up warning due to buffptr being a const
+     size_t wr_bsize;
+     char *wr_buffer;
      
 
 };
