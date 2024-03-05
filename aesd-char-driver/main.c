@@ -351,7 +351,7 @@ static long offset_loop (struct file *filp, unsigned int write_cmd, unsigned int
     }
 
     //find file offset for command
-    for(int i=0; i < write_cmd; i++)
+    for(i=0; i < write_cmd; i++)
     {
         offset +=dev->circular_buffer.entry[i].size;
     }
@@ -367,7 +367,7 @@ long aesd_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
     long retval = 0;
     struct aesd_dev *dev = filp->private_data;
     long ret=0;
-    long offset=0;
+    //long offset=0;
     struct aesd_seekto seekto;
     
 
