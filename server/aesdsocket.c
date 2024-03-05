@@ -188,7 +188,6 @@ void *thread_client_func(void* threadparam){
     
     char buffer_recv[BUFFERSIZE];
     char buffer_send[BUFFERSIZE];
-    char buffer_packet[BUFFERSIZE];
     ssize_t recvfd = 0;
     int filesize = 0;
     ssize_t packetsize = 0;
@@ -196,7 +195,6 @@ void *thread_client_func(void* threadparam){
 
     buffer_recv[0]='\0';
     buffer_send[0]='\0';
-    buffer_packet[0]='\0';
     struct thread_data *clientthreaddata = (struct thread_data *)threadparam;
 
     //Assignment 9 variables
@@ -204,7 +202,7 @@ void *thread_client_func(void* threadparam){
     bool IOCSEEKTO_found = false;
     int retval_ioctl = 0;
     bool fullpacket = false;
-    int IOC_fd=0;
+    int filefd;
 
     //while loop to receive data from client, write to txt file, and then send back
     while (!fullpacket)
@@ -241,58 +239,54 @@ void *thread_client_func(void* threadparam){
             pthread_mutex_unlock(&filemutex);
             goto conn_fail;
             }
-            IOC_fd = fileno(serverfile);
+            filefd = fileno(serverfile);
 
             //send to ioctl function
-            retval_ioctl = ioctl(IOC_fd, AESDCHAR_IOCSEEKTO, &seekto);
+            retval_ioctl = ioctl(filefd, AESDCHAR_IOCSEEKTO, &seekto);
             if(retval_ioctl < 0){
             syslog(LOG_ERR, "Failure: ioctl returned <0\n");
             printf("Failure: ioctl returned <0\n");
             }
-
-            fullpacket=true;
             //DO NOT CLOSE FILE YET
-        }
-        else if ((buffer_recv[recvfd-1]!='\n'))
-        {
-            printf("No ioctl command found. \n Did not receive full packet.\n");
-            for(ssize_t i=0; i < (recvfd); i++)
-            {
-            buffer_packet[i+packetsize] = buffer_recv[i];
-            }
-            packetsize += recvfd; 
         }
         else {
             printf("No ioctl command found. \n Received full packet. Opening file to write\n");
-            for(ssize_t i=0; i < (recvfd); i++)
-            {
-            buffer_packet[i+packetsize] = buffer_recv[i];
-            }
-            packetsize += recvfd; 
+            //for(ssize_t i=0; i < (recvfd); i++)
+            //{
+            //buffer_packet[i+packetsize] = buffer_recv[i];
+            //}
+            //packetsize += recvfd; 
 
-            buffer_packet[packetsize] = '\0';
+            //buffer_packet[packetsize] = '\0';
 
             // original write to open server file moved due to IOCSEEKTO needing to be done before full packet
             pthread_mutex_lock(&filemutex);
-            serverfile = fopen(SERVER_FILE, "a+");
-            if (serverfile < 0)
+            filefd=open(SERVER_FILE, O_RDWR || O_CREAT || O_ACCMODE, 0666);
+            if (filefd < 0)
             {  
             syslog(LOG_ERR, "Failed to open file to write: %s", strerror(errno));
             fprintf(stderr,"Failed to open file \n");
             pthread_mutex_unlock(&filemutex);
             goto conn_fail;
             }
+            //filefd=fileno(serverfile);
 
-            //write buffer value to serverfile before resetting buffer and closing file
-            fprintf(serverfile,"%s", buffer_packet);
+            packetsize=write(filefd, buffer_recv, recvfd);
+            if(packetsize > 0)
+            {
+                syslog(LOG_ERR, "Failed to write to file \n");
+                fprintf(stderr,"Failed to write to file \n");
+            }
+
             //can close super file here to just read, as previously done
-            fclose(serverfile);
+            close(filefd);
             pthread_mutex_unlock(&filemutex);    
         }    
 
         if((buffer_recv[recvfd-1]=='\n'))
         {
             fullpacket = true;
+            break;
         }
 
     }
