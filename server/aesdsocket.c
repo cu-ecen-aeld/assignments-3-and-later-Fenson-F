@@ -209,39 +209,10 @@ void *thread_client_func(void* threadparam){
     while ((recvfd = recv(clientthreaddata->clientfd, buffer_recv, BUFFERSIZE - 1, 0)) > 0)
     {
         //check if full packet was received until you find a newline character
-        if(buffer_recv[recvfd-1]!='\n')
-        {
-            //fprintf(stderr,"Received packet of size %zu \n", recvfd);
-            //fprintf(stderr,"%s",buffer_recv);
-            printf("Did not receive full packet.\n");
-            for(ssize_t i=0; i < (recvfd); i++)
-            {
-            buffer_packet[i+packetsize] = buffer_recv[i];
-            }
-                
-            packetsize += recvfd;
-                
-            //buffer_recv[0]='\0';  
-        }
-        else //end of packet found, go into this part
-        {
-            //printf("Received packet of size %zu \n", recvfd);
-            //printf("Received full packet of size %zu \n", (recvfd + packetsize));
-           printf("Received full packet \n");
-
-          
-            for(ssize_t i=0; i < (recvfd); i++)
-            {
-                buffer_packet[i+packetsize] = buffer_recv[i];
-            }
-
-            packetsize += recvfd;
-
-            buffer_packet[packetsize] = '\0';
-            
-            //Check for IOCSEEKTO command
+        if((buffer_recv[recvfd-1]!='\n')||(!IOCSEEKTO_found))
+        {   
+            //check for ioctl first
             IOCSEEKTO_found=(strstr(buffer_recv, ioctl_cmd) !=NULL);
-            
             //if IOCSEEKTO is found, 
             if(IOCSEEKTO_found)
             {
@@ -275,7 +246,7 @@ void *thread_client_func(void* threadparam){
             }
             else 
             {
-                // original write to open server file
+                // original write to open server file moved due to IOCSEEKTO needing to be done before full packet
                 printf("No ioctl command file. Opening file to write\n");
                 pthread_mutex_lock(&filemutex);
                 serverfile = fopen(SERVER_FILE, "a+");
@@ -291,12 +262,44 @@ void *thread_client_func(void* threadparam){
                 fprintf(serverfile,"%s", buffer_packet);
                 //can close super file here to just read, as previously done
                 fclose(serverfile);
+                pthread_mutex_unlock(&filemutex);
+            }
+            
+            //printf("Received packet of size %zu \n", recvfd);
+            printf("Did not receive full packet.\n");
+            for(ssize_t i=0; i < (recvfd); i++)
+            {
+            buffer_packet[i+packetsize] = buffer_recv[i];
+            }
                 
+            packetsize += recvfd;
+                
+            //buffer_recv[0]='\0';  
+        }
+        else //end of packet found, go into this part
+        {
+            //printf("Received packet of size %zu \n", recvfd);
+            //printf("Received full packet of size %zu \n", (recvfd + packetsize));
+            printf("Received full packet \n");
+
+          
+            for(ssize_t i=0; i < (recvfd); i++)
+            {
+                buffer_packet[i+packetsize] = buffer_recv[i];
+            }
+
+            packetsize += recvfd;
+
+            buffer_packet[packetsize] = '\0';
+            
+            //Reopen file if IOCSEEKTO is not found
+            if(!IOCSEEKTO_found){
+                pthread_mutex_lock(&filemutex);
                 printf("Opening file to read");
                 serverfile = fopen(SERVER_FILE, "r"); 
             }
 
-            //open file to read only
+            
             filesize = fread(buffer_send, 1, BUFFERSIZE, serverfile);
             syslog(LOG_INFO, "Success: Read file");
             printf("Success, read file.\n");
@@ -464,31 +467,32 @@ int main(int argc, char **argv){
         exit(EXIT_FAILURE);
     }
 
-    //create directory if does not exist
-    #ifndef USE_AESD_CHAR_DEVICE
-    int filesetup;
-    filesetup=mkdir(serverfile_path,0777);
-    if ((filesetup < 0) && (errno!=EEXIST))
-    {  
-        syslog(LOG_ERR, "Failed to create directory %s", strerror(errno));
-        fprintf(stderr,"Failed to create directory %s\n", strerror(errno));
-       exit(EXIT_FAILURE);
-    }
     
-    checking if file already exists. If it does, delete before starting loop (assignment specific, may delete in future)
-    if(access(serverfile_loc, F_OK) == 0)
-    {
-        fprint("File already exists. Deleting before proceeding.");
-        if(remove(serverfile_loc)!=0)
-        {
-            syslog(LOG_ERR, "Failed to delete file %s", strerror(errno));
-            fprintf(stderr,"Failed to delete file %s. Proceeding with program, may be errors. \n", strerror(errno));
-        }
-       else
-        {
-            fprintf(stderr,"File deleted succesfully. \n");
-        }
-    }
+    #ifndef USE_AESD_CHAR_DEVICE
+    //create directory if does not exist
+    //int filesetup;
+    //filesetup=mkdir(serverfile_path,0777);
+    //if ((filesetup < 0) && (errno!=EEXIST))
+    //{  
+    //    syslog(LOG_ERR, "Failed to create directory %s", strerror(errno));
+    //    fprintf(stderr,"Failed to create directory %s\n", strerror(errno));
+    //   exit(EXIT_FAILURE);
+    //}
+    
+    //checking if file already exists. If it does, delete before starting loop (assignment specific, may delete in future)
+    //if(access(serverfile_loc, F_OK) == 0)
+    //{
+    //    fprint("File already exists. Deleting before proceeding.");
+     //   if(remove(serverfile_loc)!=0)
+    //    {
+    //        syslog(LOG_ERR, "Failed to delete file %s", strerror(errno));
+    //        fprintf(stderr,"Failed to delete file %s. Proceeding with program, may be errors. \n", strerror(errno));
+     //   }
+     //  else
+    //    {
+    //        fprintf(stderr,"File deleted succesfully. \n");
+    //    }
+    //}
     
     //Create the timer and join thread
     int headret;
