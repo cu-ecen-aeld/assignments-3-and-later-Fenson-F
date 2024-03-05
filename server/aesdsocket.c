@@ -203,11 +203,12 @@ void *thread_client_func(void* threadparam){
     int retval_ioctl = 0;
     bool fullpacket = false;
     bool fullread = false;
-    int serverfd;
+    int serverfd=-1;
 
     //while loop to receive data from client, write to txt file, and then send back
     while (!fullpacket)
     {
+        printf("Receiving new packet \n");
         recvfd = recv(clientthreaddata->clientfd, buffer_recv, BUFFERSIZE, 0);
         if(recvfd < 0 || recvfd==0)
         {
@@ -225,12 +226,24 @@ void *thread_client_func(void* threadparam){
             //look to where in packet IOCSEEKTO is found
             //sscanf(str to find data, format to look for,pointer to store value of object 1, pointer to store value of object 2)
             sscanf(buffer_recv,"AESDCHAR_IOCSEEKTO:%u,%u", &seekto.write_cmd, &seekto.write_cmd_offset);
-            //printf("Seek to %u and %u\n", seekto.write_cmd, seekto.write_cmd_offset);
+            printf("Seek to %u and %u\n", seekto.write_cmd, seekto.write_cmd_offset);
 
             //lock and open file
             pthread_mutex_lock(&filemutex);
+            serverfd = open(SERVER_FILE,  O_RDWR ,0666);
+            //serverfile = fopen(SERVER_FILE, "r+");
+            //if (serverfile < 0)
+            //{  
+            //    syslog(LOG_ERR, "Failed to open file to write: %s", strerror(errno));
+            //    fprintf(stderr,"Failed to open file \n");
+            //    pthread_mutex_unlock(&filemutex);
+            //    goto conn_fail;
+            //}
             
-            serverfd = open(SERVER_FILE, O_RDWR, 0666);
+            //printf("Opened filed with fopen \n");
+
+            //serverfd=fileno(serverfile);
+            //printf("File fd is %d \n", serverfd);
             if (serverfd < 0)
             {  
                 syslog(LOG_ERR, "Failed to open file to write: %s", strerror(errno));
@@ -238,6 +251,7 @@ void *thread_client_func(void* threadparam){
                 pthread_mutex_unlock(&filemutex);
                 goto conn_fail;
             }
+
             //send to ioctl function
             retval_ioctl = ioctl(serverfd, AESDCHAR_IOCSEEKTO, &seekto);
             if(retval_ioctl < 0){
@@ -248,33 +262,47 @@ void *thread_client_func(void* threadparam){
         }
         else 
         {
-            printf("No ioctl command found. \n Received full packet. Opening file to write\n");
+            printf("No ioctl command found. \nOpening file to write \n");
             // original write to open server file moved due to IOCSEEKTO needing to be done before full packet
             pthread_mutex_lock(&filemutex);
-            serverfd=open(SERVER_FILE, O_RDWR || O_CREAT || O_ACCMODE, 0666);
+            serverfd=open(SERVER_FILE, O_CREAT || O_RDWR || O_APPEND, 0666);
+            //serverfile=fopen(SERVER_FILE, "a+");
+            //if (serverfile < 0)
+            //{  
+            //    syslog(LOG_ERR, "Failed to open file to write: %s", strerror(errno));
+            //    fprintf(stderr,"Failed to open file \n");
+            //    pthread_mutex_unlock(&filemutex);
+            //    goto conn_fail;
+            //}
+            //printf("Opened filed with fopen \n");
+
+            //serverfd=fileno(serverfile);
+            //printf("File fd is %d \n", serverfd);
             if (serverfd < 0)
             {  
                 syslog(LOG_ERR, "Failed to open file to write: %s", strerror(errno));
-                fprintf(stderr,"Failed to open file \n");
+                fprintf(stderr,"Failed to open file: %s\n", strerror(errno));
                 pthread_mutex_unlock(&filemutex);
                 goto conn_fail;
             }
-            //filefd=fileno(serverfile);
+            //printf("Got serverfd \n");
 
             packetsize=write(serverfd, buffer_recv, recvfd);
-            if(packetsize > 0)
+            if(packetsize < 0)
             {
                 syslog(LOG_ERR, "Failed to write to file \n");
                 fprintf(stderr,"Failed to write to file \n");
             }
 
             //can close super file here to just read, as previously done
+            //fclose(serverfile);
             close(serverfd);
             pthread_mutex_unlock(&filemutex);    
         }    
 
         if((buffer_recv[recvfd-1]=='\n'))
         {
+            printf("Newline found, ending read loop \n");
             fullpacket = true;
         }
 
@@ -287,17 +315,31 @@ void *thread_client_func(void* threadparam){
     {
         pthread_mutex_lock(&filemutex);
         printf("Opening file to read");
-        serverfd = open(SERVER_FILE, O_RDONLY); 
+        //serverfd = open(SERVER_FILE, O_RDONLY); 
+
+        //serverfile=fopen(SERVER_FILE, "r+");
+        //if (serverfile < 0)
+        //{  
+        //    syslog(LOG_ERR, "Failed to open file to write: %s", strerror(errno));
+        //    fprintf(stderr,"Failed to open file \n");
+        //    pthread_mutex_unlock(&filemutex);
+        //    goto conn_fail;
+        //}
+        //printf("Opened filed with fopen \n");
+
+        //serverfd=fileno(serverfile);
+        serverfd = open(SERVER_FILE,  O_RDWR ,0666);
+        printf("File fd is %d \n", serverfd);
         if (serverfd < 0)
         {  
-            syslog(LOG_ERR, "Failed to open file to write: %s", strerror(errno));
+            syslog(LOG_ERR, "Failed to open file to send back: %s", strerror(errno));
             fprintf(stderr,"Failed to open file \n");
             pthread_mutex_unlock(&filemutex);
             goto conn_fail;
         }
     }
 
-    while (fullread) 
+    while (!fullread) 
     {
         printf("In read loop. Sending data back \n");
         filesize = read(serverfd, buffer_send, BUFFERSIZE);
@@ -320,6 +362,7 @@ void *thread_client_func(void* threadparam){
             //fprintf(stderr,"Sending: %s", buffer_send);
             syslog(LOG_INFO, "Sending file to client");
             printf("Sending file to client \n");
+            pthread_mutex_unlock(&filemutex);  
             sendret = send(clientthreaddata->clientfd,buffer_send,filesize,0);
             if(sendret == -1)
             {
@@ -330,6 +373,7 @@ void *thread_client_func(void* threadparam){
         }
     }
 
+    //fclose(serverfile);
     close(serverfd);
     pthread_mutex_unlock(&filemutex);
 

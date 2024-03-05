@@ -334,95 +334,70 @@ loff_t aesd_llseek(struct file *filp, loff_t off, int whence)
 
 }
 
-static long offset_loop (struct file *filp, unsigned int write_cmd, unsigned int write_offset) {
-
-    unsigned int i = 0;
-    long ret = 0;
-    long offset = 0;
-    long retval = 0;
-    struct aesd_dev *dev = filp->private_data;
-
-    ret=mutex_lock_interruptible(&dev->lock);
-    if(ret != 0) 
-    {
-        PDEBUG("Failure: Mutex could not lock \n");
-        //printk(KERN_ALERT, "Failure: could not lock mutex \n");
-        return -ERESTARTSYS;
-    }
-
-    //find file offset for command
-    for(i=0; i < write_cmd; i++)
-    {
-        offset +=dev->circular_buffer.entry[i].size;
-    }
-
-    filp->f_pos = offset + write_offset;
-    mutex_unlock(&dev->lock);
-    
-    return retval;
-}
-
 long aesd_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 {
     long retval = 0;
+    unsigned int index = 0;
     struct aesd_dev *dev = filp->private_data;
     long ret=0;
-    //long offset=0;
+    long offset=0;
     struct aesd_seekto seekto;
     
 
     PDEBUG("ioctl command %u with arg %lu \n", cmd, arg);
 
-    //check if command is validy
-    if(_IOC_TYPE(cmd) != AESD_IOC_MAGIC)
-    {
-        return -ENOTTY;
-    }
-    else if(_IOC_TYPE(cmd) > AESDCHAR_IOC_MAXNR)
-    {
-        return -ENOTTY;
-    }
+    //check if command is valid => from scull
+    if(_IOC_TYPE(cmd) != AESD_IOC_MAGIC) return -ENOTTY;
+    else if(_IOC_NR(cmd) > AESDCHAR_IOC_MAXNR) return -ENOTTY;
 
-    ret=mutex_lock_interruptible(&dev->lock);
-    if(ret != 0) {
-        PDEBUG("Failure: Mutex could not lock \n");
-        //printk(KERN_ALERT, "Failure: could not lock mutex \n");
-        return -ERESTARTSYS;
-    }
-
-    //check if command is within range
-    if(seekto.write_cmd > AESDCHAR_MAX_WRITE_OPERATIONS_SUPPORTED) 
+    //Integrity on data passed => Removed due to needing specific header
+    /*if(_IOC_DIR(cmd) & _IOC_READ)
     {
-        mutex_unlock(&dev->lock);
-        return -EINVAL;
+        ret=!access_ok_wrapper(VERIFY_WRITE, (void __user*)arg, _IOC_SIZE(cmd));
     }
-    else if(seekto.write_cmd_offset > dev->circular_buffer.entry[seekto.write_cmd].size)
+    else if(_IOC_DIR(cmd) & _IOC_WRITE)
     {
-        mutex_unlock(&dev->lock);
-        return -EINVAL;
+        ret=!access_ok_wrapper(VERIFY_WRITE, (void __user*)arg, _IOC_SIZE(cmd));
     }
-    mutex_unlock(&dev->lock);
+    if(ret)
+    {
+        return -EFAULT;
+    }*/
     
-    //copy from user before case for easier readability
-    ret = copy_from_user(&seekto, (const void __user *)arg, sizeof(seekto));
-    
+    //DO NOT MUTEX LOCK HERE
     switch (cmd)
     {
         case AESDCHAR_IOCSEEKTO:
+            ret = copy_from_user(&seekto, (const void __user *)arg, sizeof(seekto));
             if (ret !=0)
             {
                 return -EFAULT;
             }
             else 
             {               
-                retval = offset_loop(filp, seekto.write_cmd, seekto.write_cmd_offset);
+                ret=mutex_lock_interruptible(&dev->lock);
+                if(ret != 0) 
+                {
+                    PDEBUG("Failure: Mutex could not lock \n");
+                    //printk(KERN_ALERT, "Failure: could not lock mutex \n");
+                    return -ERESTARTSYS;
+                }
+
+                //find file offset for command
+                while (index < seekto.write_cmd)
+                {
+                    offset +=dev->circular_buffer.entry[index].size;
+                    index++;
+                }
+
+                filp->f_pos = offset + seekto.write_cmd_offset;
+                mutex_unlock(&dev->lock);
             }
             
             break;
         
         default:
-            return -EINVAL;
-            break;
+            return -ENOTTY;
     }
     
     return retval;
