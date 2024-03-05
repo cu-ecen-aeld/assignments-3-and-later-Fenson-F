@@ -334,6 +334,34 @@ loff_t aesd_llseek(struct file *filp, loff_t off, int whence)
 
 }
 
+static long offset_loop (struct file *filp, unsigned int write_cmd, unsigned int write_offset) {
+
+    unsigned int i = 0;
+    long ret = 0;
+    long offset = 0;
+    long retval = 0;
+    struct aesd_dev *dev = filp->private_data;
+
+    ret=mutex_lock_interruptible(&dev->lock);
+    if(ret != 0) 
+    {
+        PDEBUG("Failure: Mutex could not lock \n");
+        //printk(KERN_ALERT, "Failure: could not lock mutex \n");
+        return -ERESTARTSYS;
+    }
+
+    //find file offset for command
+    for(int i=0; i < write_cmd; i++)
+    {
+        offset +=dev->circular_buffer.entry[i].size;
+    }
+
+    filp->f_pos = offset + write_offset;
+    mutex_unlock(&dev->lock);
+    
+    return retval;
+}
+
 long aesd_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 {
     long retval = 0;
@@ -386,30 +414,8 @@ long aesd_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
                 return -EFAULT;
             }
             else 
-            {
-                
-                ret=mutex_lock_interruptible(&dev->lock);
-                if(ret != 0) 
-                {
-                    PDEBUG("Failure: Mutex could not lock \n");
-                    //printk(KERN_ALERT, "Failure: could not lock mutex \n");
-                    return -ERESTARTSYS;
-                }
-
-                //find file offset for command
-                int write_cmd = seekto.write_cmd;
-
-                for(int i=0; i < write_cmd; i++)
-                {
-                    offset +=dev->circular_buffer.entry[i].size;
-                }
-
-                //update fpos
-                filp->f_pos = offset + seekto.write_cmd_offset;
-                
-                mutex_unlock(&dev->lock);
-
-                retval = 0;
+            {               
+                retval = offset_loop(filp, seekto.write_cmd, seekto.write_cmd_offset);
             }
             
             break;
