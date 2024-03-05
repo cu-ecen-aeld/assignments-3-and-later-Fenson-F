@@ -25,6 +25,7 @@
 #include <linux/errno.h>
 
 #include "aesdchar.h"
+#include "aesd_ioctl.h"
 int aesd_major =   0; // use dynamic major
 int aesd_minor =   0;
 
@@ -290,12 +291,143 @@ ssize_t aesd_write(struct file *filp, const char __user *buf, size_t count,
     return retval;
 }
 
+loff_t aesd_llseek(struct file *filp, loff_t off, int whence)
+{
+    struct aesd_dev *dev = filp->private_data;
+    struct aesd_buffer_entry *entry;
+    loff_t newpos, retval;
+    int index=0;
+    int circular_buffer_size=0;
+    int ret;
+
+    PDEBUG("llseek type %d with offset of %lld \n", whence, off);
+
+    //lock dev up to ensure correct positioning
+    ret=mutex_lock_interruptible(&dev->lock);
+    if(ret != 0) {
+        PDEBUG("Failure: Mutex could not lock \n");
+        //printk(KERN_ALERT, "Failure: could not lock mutex \n");
+        return -ERESTARTSYS;
+    }
+
+    //find current aesd circular buffer size
+    AESD_CIRCULAR_BUFFER_FOREACH(entry,&dev->circular_buffer,index)
+    {
+        if(entry->buffptr != NULL){
+            circular_buffer_size += entry->size;
+        }
+    }
+
+    //fixed_size_llseek as per lectures
+    newpos = fixed_size_llseek(filp, off, whence, circular_buffer_size);
+    if (newpos < 0)
+    {
+        mutex_unlock(&dev->lock);
+        return -EINVAL;
+    }
+    
+    //update f_pos, unlock and return new position
+    filp->f_pos = newpos;
+    retval=newpos;
+    mutex_unlock(&dev->lock);
+    return retval;
+
+}
+
+long aesd_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
+{
+    long retval = 0;
+    struct aesd_dev *dev = filp->private_data;
+    long ret=0;
+    long offset=0;
+    struct aesd_seekto seekto;
+    
+
+    PDEBUG("ioctl command %u with arg %lu \n", cmd, arg);
+
+    //check if command is validy
+    if(_IOC_TYPE(cmd) != AESD_IOC_MAGIC)
+    {
+        return -ENOTTY;
+    }
+    else if(_IOC_TYPE(cmd) > AESDCHAR_IOC_MAXNR)
+    {
+        return -ENOTTY;
+    }
+
+    ret=mutex_lock_interruptible(&dev->lock);
+    if(ret != 0) {
+        PDEBUG("Failure: Mutex could not lock \n");
+        //printk(KERN_ALERT, "Failure: could not lock mutex \n");
+        return -ERESTARTSYS;
+    }
+
+    //check if command is within range
+    if(seekto.write_cmd > AESDCHAR_MAX_WRITE_OPERATIONS_SUPPORTED) 
+    {
+        mutex_unlock(&dev->lock);
+        return -EINVAL;
+    }
+    else if(seekto.write_cmd_offset > dev->circular_buffer.entry[seekto.write_cmd].size)
+    {
+        mutex_unlock(&dev->lock);
+        return -EINVAL;
+    }
+    mutex_unlock(&dev->lock);
+    
+    //copy from user before case for easier readability
+    ret = copy_from_user(&seekto, (const void __user *)arg, sizeof(seekto));
+    
+    switch (cmd)
+    {
+        case AESDCHAR_IOCSEEKTO:
+            if (ret !=0)
+            {
+                return -EFAULT;
+            }
+            else 
+            {
+                
+                ret=mutex_lock_interruptible(&dev->lock);
+                if(ret != 0) 
+                {
+                    PDEBUG("Failure: Mutex could not lock \n");
+                    //printk(KERN_ALERT, "Failure: could not lock mutex \n");
+                    return -ERESTARTSYS;
+                }
+
+                //find file offset for command
+                for(int i=0; seekto.write_cmd; i++)
+                {
+                    offset +=dev->circular_buffer.entry[i].size;
+                }
+
+                //update fpos
+                filp->f_pos = offset + seekto.write_cmd_offset;
+                
+                mutex_unlock(&dev->lock);
+
+                retval = 0;
+            }
+            
+            break;
+        
+        default:
+            return -EINVAL;
+            break;
+    }
+    
+    return retval;
+}
+
 struct file_operations aesd_fops = {
     .owner =    THIS_MODULE,
     .read =     aesd_read,
     .write =    aesd_write,
     .open =     aesd_open,
     .release =  aesd_release,
+    .llseek = aesd_llseek,
+    .unlocked_ioctl = aesd_ioctl,
 };
 
 static int aesd_setup_cdev(struct aesd_dev *dev)

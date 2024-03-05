@@ -59,6 +59,8 @@ __used __section("__versions") =
 	"__ubsan_handle_out_of_bounds\0\0\0\0"
 	"\x14\x00\x00\x00\xc4\x3d\x68\xa1"
 	"cdev_add\0\0\0\0"
+	"\x1c\x00\x00\x00\x7e\x24\x6e\x27"
+	"fixed_size_llseek\0\0\0"
 	"\x18\x00\x00\x00\x9f\x0c\xfb\xce"
 	"__mutex_init\0\0\0\0"
 	"\x24\x00\x00\x00\x75\x08\x94\x89"
@@ -90,4 +92,4 @@ __used __section("__versions") =
 MODULE_INFO(depends, "");
 
 
-MODULE_INFO(srcversion, "C2AF3B6F76A6DC9BC11B66A");
+MODULE_INFO(srcversion, "426092774EF1D7EF0D9790A");

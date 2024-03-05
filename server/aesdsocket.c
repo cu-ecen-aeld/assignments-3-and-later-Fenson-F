@@ -20,6 +20,8 @@
 #include <time.h>
 #include <stdbool.h>
 
+#include "../aesd-char-driver/aesd_ioctl.h"
+
 #define PORT 9000
 #define BUFFERSIZE 2048 //20kB
 
@@ -49,7 +51,7 @@ int backlog = 5; //number of clients
 
 volatile sig_atomic_t tstatus= 0;
 
-
+const char *ioctl_cmd = "AESDCHAR_IOCSEEKTO";
 
 pthread_t jointhread = {0};
 
@@ -197,6 +199,12 @@ void *thread_client_func(void* threadparam){
     buffer_packet[0]='\0';
     struct thread_data *clientthreaddata = (struct thread_data *)threadparam;
 
+    //Assignment 9 variables
+    struct aesd_seekto seekto;
+    bool IOCSEEKTO_found = false;
+    int retval_ioctl = 0;
+
+
     //while loop to receive data from client, write to txt file, and then send back
     while ((recvfd = recv(clientthreaddata->clientfd, buffer_recv, BUFFERSIZE - 1, 0)) > 0)
     {
@@ -220,7 +228,8 @@ void *thread_client_func(void* threadparam){
             //printf("Received packet of size %zu \n", recvfd);
             //printf("Received full packet of size %zu \n", (recvfd + packetsize));
            printf("Received full packet \n");
-                
+
+          
             for(ssize_t i=0; i < (recvfd); i++)
             {
                 buffer_packet[i+packetsize] = buffer_recv[i];
@@ -229,30 +238,68 @@ void *thread_client_func(void* threadparam){
             packetsize += recvfd;
 
             buffer_packet[packetsize] = '\0';
+            
+            //Check for IOCSEEKTO command
+            IOCSEEKTO_found=(strstr(buffer_recv, ioctl_cmd) !=NULL);
+            
+            //if IOCSEEKTO is found, 
+            if(IOCSEEKTO_found)
+            {
+                printf("Found ioctl command in packet \n");
 
-            //open file to only append
-            pthread_mutex_lock(&filemutex);
+                //look to where in packet IOCSEEKTO is found
+                //sscanf(str to find data, format to look for,pointer to store value of object 1, pointer to store value of object 2)
+                sscanf(buffer_recv,"AESDCHAR_IOCSEEKTO:%d,%d", &seekto.write_cmd, &seekto.write_cmd_offset);
+                printf("Seek to %d and %d\n", seekto.write_cmd, seekto.write_cmd_offset);
 
-            printf("Opening file \n");
-            serverfile = fopen(SERVER_FILE, "a+");
-            if (serverfile < 0)
-            {  
+                //lock and open file
+                pthread_mutex_lock(&filemutex);
+                serverfile = fopen(SERVER_FILE, "r");
+                if (serverfile < 0)
+                {  
                 syslog(LOG_ERR, "Failed to open file to write: %s", strerror(errno));
                 fprintf(stderr,"Failed to open file \n");
                 pthread_mutex_unlock(&filemutex);
                 goto conn_fail;
+                }
+
+                //send to ioctl function
+                retval_ioctl = ioctl(serverfd, AESDCHAR_IOCSEEKTO, &seekto);
+                if(retval_ioctl < 0){
+                syslog(LOG_ERR, "Failure: ioctl returned <0\n");
+                printf("Failure: ioctl returned <0\n");
+                }
+
+                //DO NOT CLOSE FILE YET
+
+            }
+            else 
+            {
+                // original write to open server file
+                printf("No ioctl command file. Opening file to write\n");
+                pthread_mutex_lock(&filemutex);
+                serverfile = fopen(SERVER_FILE, "a+");
+                if (serverfile < 0)
+                {  
+                syslog(LOG_ERR, "Failed to open file to write: %s", strerror(errno));
+                fprintf(stderr,"Failed to open file \n");
+                pthread_mutex_unlock(&filemutex);
+                goto conn_fail;
+                }
+
+                //write buffer value to serverfile before resetting buffer and closing file
+                fprintf(serverfile,"%s", buffer_packet);
+                //can close super file here to just read, as previously done
+                fclose(serverfile);
+                
+                printf("Opening file to read");
+                serverfile = fopen(SERVER_FILE, "r"); 
             }
 
-            //write buffer value to serverfile before resetting buffer and closing file
-            fprintf(serverfile,"%s", buffer_packet);
-            fclose(serverfile);
-
             //open file to read only
-            serverfile = fopen(SERVER_FILE, "r");
             filesize = fread(buffer_send, 1, BUFFERSIZE, serverfile);
             syslog(LOG_INFO, "Success: Read file");
             printf("Success, read file.\n");
-            fclose(serverfile);
 
             //Sending file to client
             syslog(LOG_INFO, "Sending file to client");
@@ -264,7 +311,7 @@ void *thread_client_func(void* threadparam){
                 syslog(LOG_ERR, "Failed to send file to client: %s", strerror(errno));
                 fprintf(stderr,"Failed to send file to client \n");
             }
-            
+            fclose(serverfile);
             pthread_mutex_unlock(&filemutex);
             packetsize = 0;
             
@@ -419,29 +466,29 @@ int main(int argc, char **argv){
 
     //create directory if does not exist
     #ifndef USE_AESD_CHAR_DEVICE
-    //int filesetup;
-    //filesetup=mkdir(serverfile_path,0777);
-    //if ((filesetup < 0) && (errno!=EEXIST))
-    //{  
-    //    syslog(LOG_ERR, "Failed to create directory %s", strerror(errno));
-    //    fprintf(stderr,"Failed to create directory %s\n", strerror(errno));
-     //   exit(EXIT_FAILURE);
-    //}
+    int filesetup;
+    filesetup=mkdir(serverfile_path,0777);
+    if ((filesetup < 0) && (errno!=EEXIST))
+    {  
+        syslog(LOG_ERR, "Failed to create directory %s", strerror(errno));
+        fprintf(stderr,"Failed to create directory %s\n", strerror(errno));
+       exit(EXIT_FAILURE);
+    }
     
-    //checking if file already exists. If it does, delete before starting loop (assignment specific, may delete in future)
-    //if(access(serverfile_loc, F_OK) == 0)
-    //{
-    //    fprint("File already exists. Deleting before proceeding.");
-    //    if(remove(serverfile_loc)!=0)
-    //    {
-    //        syslog(LOG_ERR, "Failed to delete file %s", strerror(errno));
-    //        fprintf(stderr,"Failed to delete file %s. Proceeding with program, may be errors. \n", strerror(errno));
-    //    }
-     //   else
-    //    {
-    //        fprintf(stderr,"File deleted succesfully. \n");
-    //    }
-    //}
+    checking if file already exists. If it does, delete before starting loop (assignment specific, may delete in future)
+    if(access(serverfile_loc, F_OK) == 0)
+    {
+        fprint("File already exists. Deleting before proceeding.");
+        if(remove(serverfile_loc)!=0)
+        {
+            syslog(LOG_ERR, "Failed to delete file %s", strerror(errno));
+            fprintf(stderr,"Failed to delete file %s. Proceeding with program, may be errors. \n", strerror(errno));
+        }
+       else
+        {
+            fprintf(stderr,"File deleted succesfully. \n");
+        }
+    }
     
     //Create the timer and join thread
     int headret;
