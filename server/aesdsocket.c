@@ -216,6 +216,14 @@ void *thread_client_func(void* threadparam){
             fprintf(stderr,"Failed to receive packet information\n");
             break;
         } 
+
+        //moved above IOCSEEKTO as that was losing the spot of ioctl
+        for(ssize_t i=0; i < (recvfd); i++)
+        {
+        buffer_packet[i+packetsize] = buffer_recv[i];
+        }
+        packetsize += recvfd;
+
         //check for ioctl first
         IOCSEEKTO_found=(strstr(buffer_recv, ioctl_cmd) !=NULL);
         //if IOCSEEKTO is found, 
@@ -230,7 +238,7 @@ void *thread_client_func(void* threadparam){
 
             //lock and open file
             pthread_mutex_lock(&filemutex);
-            serverfile = fopen(SERVER_FILE, "r");
+            serverfile = fopen(SERVER_FILE, "r+");
             if (serverfile < 0)
             {  
             syslog(LOG_ERR, "Failed to open file to write: %s", strerror(errno));
@@ -271,13 +279,6 @@ void *thread_client_func(void* threadparam){
             pthread_mutex_unlock(&filemutex);
             
         }    
-
-        for(ssize_t i=0; i < (recvfd); i++)
-        {
-        buffer_packet[i+packetsize] = buffer_recv[i];
-        }
-                
-        packetsize += recvfd;
 
         if(buffer_packet[recvfd-1]=='\n')
         {
