@@ -397,7 +397,9 @@ long aesd_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
                 }
 
                 //find file offset for command
-                for(int i=0; seekto.write_cmd; i++)
+                int write_cmd = seekto.write_cmd;
+
+                for(int i=0; i < write_cmd; i++)
                 {
                     offset +=dev->circular_buffer.entry[i].size;
                 }
