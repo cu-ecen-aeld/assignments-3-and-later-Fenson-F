@@ -41,7 +41,7 @@ FILE * serverfile;
     pthread_t timerthread = {0};
 #endif
 
-pthread_mutex_t listmutex;
+//pthread_mutex_t listmutex;
 pthread_mutex_t filemutex;
 
 //FILE *serverfile = NULL;
@@ -144,7 +144,7 @@ void* thread_join_func(void* threadparam){
         int joinsize=0;
 
         //check each item in the list for any completed and store
-        pthread_mutex_lock(&listmutex);
+        //pthread_mutex_lock(&listmutex);
 
         SLIST_FOREACH(currentthread, &head, node){
             if(currentthread->complete == 1) {
@@ -172,7 +172,7 @@ void* thread_join_func(void* threadparam){
             delete_thread_data(removethread[i]);
         }
 
-        pthread_mutex_unlock(&listmutex);
+        //pthread_mutex_unlock(&listmutex);
 
         if(removethread!=NULL)
         {
@@ -218,11 +218,6 @@ void *thread_client_func(void* threadparam){
         } 
 
         //moved above IOCSEEKTO as that was losing the spot of ioctl
-        for(ssize_t i=0; i < (recvfd); i++)
-        {
-        buffer_packet[i+packetsize] = buffer_recv[i];
-        }
-        packetsize += recvfd;
 
         //check for ioctl first
         IOCSEEKTO_found=(strstr(buffer_recv, ioctl_cmd) !=NULL);
@@ -233,8 +228,8 @@ void *thread_client_func(void* threadparam){
 
             //look to where in packet IOCSEEKTO is found
             //sscanf(str to find data, format to look for,pointer to store value of object 1, pointer to store value of object 2)
-            sscanf(buffer_recv,"AESDCHAR_IOCSEEKTO:%d,%d", &seekto.write_cmd, &seekto.write_cmd_offset);
-            //printf("Seek to %d and %d\n", seekto.write_cmd, seekto.write_cmd_offset);
+            sscanf(buffer_recv,"AESDCHAR_IOCSEEKTO:%u,%u", &seekto.write_cmd, &seekto.write_cmd_offset);
+            //printf("Seek to %u and %u\n", seekto.write_cmd, seekto.write_cmd_offset);
 
             //lock and open file
             pthread_mutex_lock(&filemutex);
@@ -255,13 +250,29 @@ void *thread_client_func(void* threadparam){
             printf("Failure: ioctl returned <0\n");
             }
 
+            fullpacket=true;
             //DO NOT CLOSE FILE YET
-
         }
-        else 
+        else if ((buffer_recv[recvfd-1]!='\n'))
         {
+            printf("No ioctl command found. \n Did not receive full packet.\n");
+            for(ssize_t i=0; i < (recvfd); i++)
+            {
+            buffer_packet[i+packetsize] = buffer_recv[i];
+            }
+            packetsize += recvfd; 
+        }
+        else {
+            printf("No ioctl command found. \n Received full packet. Opening file to write\n");
+            for(ssize_t i=0; i < (recvfd); i++)
+            {
+            buffer_packet[i+packetsize] = buffer_recv[i];
+            }
+            packetsize += recvfd; 
+
+            buffer_packet[packetsize] = '\0';
+
             // original write to open server file moved due to IOCSEEKTO needing to be done before full packet
-            printf("No ioctl command file. Opening file to write\n");
             pthread_mutex_lock(&filemutex);
             serverfile = fopen(SERVER_FILE, "a+");
             if (serverfile < 0)
@@ -276,15 +287,14 @@ void *thread_client_func(void* threadparam){
             fprintf(serverfile,"%s", buffer_packet);
             //can close super file here to just read, as previously done
             fclose(serverfile);
-            pthread_mutex_unlock(&filemutex);
-            
+            pthread_mutex_unlock(&filemutex);    
         }    
 
-        if(buffer_packet[recvfd-1]=='\n')
+        if((buffer_recv[recvfd-1]=='\n'))
         {
-            fullpacket=true;
-            buffer_packet[packetsize] = '\0';
+            fullpacket = true;
         }
+
     }
 
     printf("Received full packet \n");
@@ -314,7 +324,6 @@ void *thread_client_func(void* threadparam){
     }
     fclose(serverfile);
     pthread_mutex_unlock(&filemutex);
-    packetsize = 0;
 
     clientthreaddata->complete = 1;
 
@@ -343,14 +352,14 @@ static void sig_handler(int sigflag){
 
     struct thread_data *threaddelptr = NULL;
 
-    pthread_mutex_lock(&listmutex);
+    //pthread_mutex_lock(&listmutex);
 
     while(!SLIST_EMPTY(&head)){
         threaddelptr = SLIST_FIRST(&head);
         SLIST_REMOVE(&head, threaddelptr, thread_data, node);
         delete_thread_data(threaddelptr);
     }
-    pthread_mutex_unlock(&listmutex);
+    //pthread_mutex_unlock(&listmutex);
 
     //close file descriptors and threads
     #ifndef USE_AESD_CHAR_DEVICE
@@ -367,7 +376,7 @@ static void sig_handler(int sigflag){
     #endif
 
     pthread_mutex_destroy(&filemutex);
-    pthread_mutex_destroy(&listmutex);     
+    //pthread_mutex_destroy(&listmutex);     
 
     //close syslogging
     syslog(LOG_INFO, "Finished Logging for aesdsocket");
@@ -500,7 +509,7 @@ int main(int argc, char **argv){
 
     //start join thread seperately
     int joinret;
-    pthread_mutex_lock(&listmutex);
+    //pthread_mutex_lock(&listmutex);
     joinret  = pthread_create(&jointhread, NULL, thread_join_func, NULL);
     if(joinret != 0 ){
         syslog(LOG_ERR, "Failed to create join thread%s",strerror(errno));
@@ -508,7 +517,7 @@ int main(int argc, char **argv){
         //pthread_mutex_unlock(&listmutex);
         exit(EXIT_FAILURE);
     }
-    pthread_mutex_unlock(&listmutex);
+    //pthread_mutex_unlock(&listmutex);
 
 
     // While loop that listens for new sockets before entering inner loop to receive data
@@ -550,7 +559,7 @@ int main(int argc, char **argv){
             newclientthread->complete=0;
         }
         //add the new connection as the new head to avoid having to keep track of the tail
-        pthread_mutex_lock(&listmutex);
+        //pthread_mutex_lock(&listmutex);
         SLIST_INSERT_HEAD(&head, newclientthread, node);
 
         tailret  = pthread_create(&newclientthread->thread, NULL, thread_client_func, (void*) newclientthread);
@@ -563,7 +572,7 @@ int main(int argc, char **argv){
             
         }
         newclientthread = NULL;
-        pthread_mutex_unlock(&listmutex);
+        //pthread_mutex_unlock(&listmutex);
         
     }
 
