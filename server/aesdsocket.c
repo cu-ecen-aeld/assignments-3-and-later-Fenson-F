@@ -206,18 +206,21 @@ void *thread_client_func(void* threadparam){
     int serverfd=-1;
 
     //while loop to receive data from client, write to txt file, and then send back
-    while (!fullpacket)
+    while (!fullpacket && !IOCSEEKTO_found)
     {
         printf("Receiving new packet \n");
-        recvfd = recv(clientthreaddata->clientfd, buffer_recv, BUFFERSIZE, 0);
-        if(recvfd < 0 || recvfd==0)
+        
+        //will need at least 1 run, so check both inside while loop
+        recvfd=recv(clientthreaddata->clientfd, buffer_recv, BUFFERSIZE, 0);
+        if(recvfd < 0)
         {
             syslog(LOG_ERR, "Error: Failure to receive packet information: %s", strerror(errno));
             fprintf(stderr,"Failed to receive packet information\n");
-            break;
+            goto conn_fail;
         } 
-
+        
         IOCSEEKTO_found=(strstr(buffer_recv, ioctl_cmd) !=NULL);
+        
         //if IOCSEEKTO is found, 
         if(IOCSEEKTO_found)
         {
@@ -226,7 +229,7 @@ void *thread_client_func(void* threadparam){
             //look to where in packet IOCSEEKTO is found
             //sscanf(str to find data, format to look for,pointer to store value of object 1, pointer to store value of object 2)
             sscanf(buffer_recv,"AESDCHAR_IOCSEEKTO:%u,%u", &seekto.write_cmd, &seekto.write_cmd_offset);
-            printf("Seek to %u and %u\n", seekto.write_cmd, seekto.write_cmd_offset);
+            //printf("Seek to %u and %u\n", seekto.write_cmd, seekto.write_cmd_offset);
 
             //lock and open file
             pthread_mutex_lock(&filemutex);
@@ -259,6 +262,7 @@ void *thread_client_func(void* threadparam){
             printf("Failure: ioctl returned <0\n");
             }
             //DO NOT CLOSE FILE YET
+            fullpacket = true;
         }
         else 
         {
@@ -296,48 +300,23 @@ void *thread_client_func(void* threadparam){
 
             //can close super file here to just read, as previously done
             //fclose(serverfile);
-            close(serverfd);
-            pthread_mutex_unlock(&filemutex);    
-        }    
 
-        if((buffer_recv[recvfd-1]=='\n'))
-        {
-            printf("Newline found, ending read loop \n");
-            fullpacket = true;
-        }
+            if((buffer_recv[recvfd-1]=='\n'))
+            {
+                printf("Newline found, ending read loop \n");
+                fullpacket = true;
+                
+            }
+            else
+            {
+                close(serverfd);
+                pthread_mutex_unlock(&filemutex);
+            }    
+        }    
 
     }
 
     printf("Received full packet \n");
-            
-    //Reopen file if IOCSEEKTO is not found
-    if(!IOCSEEKTO_found)
-    {
-        pthread_mutex_lock(&filemutex);
-        printf("Opening file to read");
-        //serverfd = open(SERVER_FILE, O_RDONLY); 
-
-        //serverfile=fopen(SERVER_FILE, "r+");
-        //if (serverfile < 0)
-        //{  
-        //    syslog(LOG_ERR, "Failed to open file to write: %s", strerror(errno));
-        //    fprintf(stderr,"Failed to open file \n");
-        //    pthread_mutex_unlock(&filemutex);
-        //    goto conn_fail;
-        //}
-        //printf("Opened filed with fopen \n");
-
-        //serverfd=fileno(serverfile);
-        serverfd = open(SERVER_FILE,  O_RDWR ,0666);
-        printf("File fd is %d \n", serverfd);
-        if (serverfd < 0)
-        {  
-            syslog(LOG_ERR, "Failed to open file to send back: %s", strerror(errno));
-            fprintf(stderr,"Failed to open file \n");
-            pthread_mutex_unlock(&filemutex);
-            goto conn_fail;
-        }
-    }
 
     while (!fullread) 
     {
@@ -368,6 +347,7 @@ void *thread_client_func(void* threadparam){
             {
                 syslog(LOG_ERR, "Failed to send file to client: %s", strerror(errno));
                 fprintf(stderr,"Failed to send file to client \n");
+                goto conn_fail;
             }
         
         }
