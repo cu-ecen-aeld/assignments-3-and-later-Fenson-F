@@ -262,7 +262,7 @@ void *thread_client_func(void* threadparam){
             printf("Failure: ioctl returned <0\n");
             }
             //DO NOT CLOSE FILE YET
-            fullpacket = true;
+            
         }
         else 
         {
@@ -297,34 +297,41 @@ void *thread_client_func(void* threadparam){
                 syslog(LOG_ERR, "Failed to write to file \n");
                 fprintf(stderr,"Failed to write to file \n");
             }
+            
 
-            //can close super file here to just read, as previously done
-            //fclose(serverfile);
-
+            close(serverfd);
+            pthread_mutex_unlock(&filemutex);
+            
             if((buffer_recv[recvfd-1]=='\n'))
             {
                 printf("Newline found, ending read loop \n");
                 fullpacket = true;
-                
-            }
-            else
-            {
-                close(serverfd);
-                pthread_mutex_unlock(&filemutex);
-            }    
-        }    
+
+                pthread_mutex_lock(&filemutex);
+                printf("Reopening the file \n");
+                serverfd = open(SERVER_FILE, O_RDWR, 0666);
+                if (serverfd < 0 )
+                {
+                    syslog(LOG_ERR,"failred to reopen file after newline found: %s", strerror(errno));
+                    fprintf(stderr, "Failured to reopen file after newline found \n");
+                    pthread_mutex_unlock(&filemutex);
+                    goto conn_fail;
+                } 
+            } 
+            
+        }   
 
     }
 
     printf("Received full packet \n");
-
+ 
     while (!fullread) 
     {
         printf("In read loop. Sending data back \n");
         filesize = read(serverfd, buffer_send, BUFFERSIZE);
         if (filesize < 0) 
         {
-            syslog(LOG_ERR, "Failed to open file to write: %s", strerror(errno));
+            syslog(LOG_ERR, "Failed to open file to read: %s", strerror(errno));
             fprintf(stderr,"Failed to open file \n");
             pthread_mutex_unlock(&filemutex);
             goto conn_fail;
